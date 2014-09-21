@@ -36,6 +36,10 @@
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HawkeyeInjectorN2x64, Version=2.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Injector\HawkeyeInjectorN2x64.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib">
       <HintPath>$(windir)\Microsoft.NET\Framework64\v2.0.50727\mscorlib.dll</HintPath>
     </Reference>
@@ -47,12 +51,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HawkeyeInjector\HawkeyeInjectorN2x64.vcxproj">
-      <Project>{C29817A9-3696-421D-89BD-F66681657C37}</Project>
-      <Name>HawkeyeInjectorN2x64</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

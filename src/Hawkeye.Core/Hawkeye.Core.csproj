@@ -69,6 +69,10 @@
     <Compile Include="extensions\TypeExtensions.cs" />
     <Compile Include="HawkeyeApplication.cs" />
     <Compile Include="HawkeyeApplicationInfo.cs" />
+    <Compile Include="Scripting\RichTextBoxLogger.cs.cs" />
+    <Compile Include="Scripting\BaseScriptLogger.cs" />
+    <Compile Include="Scripting\CSharpScriptCompiler.cs" />
+    <Compile Include="Scripting\ScriptLogger.cs" />
     <Compile Include="Shell.cs" />
     <Compile Include="HawkeyeAttacher.cs" />
     <Compile Include="Logging\BaseLogService.cs" />
@@ -114,6 +118,9 @@
     <Compile Include="ComponentModel\descriptors\TypePropertyDescriptor.cs" />
     <Compile Include="UI\Controls\PropertyGridEx.searchBox.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\Controls\ScriptBox.cs">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="UI\DotNetPropertyGrid.cs">
       <SubType>Component</SubType>
@@ -199,6 +206,9 @@
     <EmbeddedResource Include="UI\AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\Controls\ScriptBox.resx">
+      <DependentUpon>ScriptBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\MainControl.resx">
       <DependentUpon>MainControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -236,6 +246,7 @@
   <ItemGroup>
     <None Include="Resources\Highlight.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

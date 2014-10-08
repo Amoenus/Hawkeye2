@@ -7,6 +7,7 @@ using System.ComponentModel;
 using Hawkeye.WinApi;
 using Hawkeye.Logging;
 using Hawkeye.ComponentModel;
+using Hawkeye.UI.Controls;
 
 namespace Hawkeye.UI
 {
@@ -30,6 +31,7 @@ namespace Hawkeye.UI
             // Remove the .NET Tab (to hide it)
             tabs.SuspendLayout();
             tabs.TabPages.Remove(dotNetTabPage);
+			tabs.TabPages.Remove(scriptTabPage);
             tabs.ResumeLayout(false);
 
             dotNetPropertyGrid.ActionClicked += (s, e) => HandleDotNetPropertyGridAction(e.Action);
@@ -118,12 +120,19 @@ namespace Hawkeye.UI
                     tabs.TabPages.Add(dotNetTabPage);
                 FillControlInfo(controlInfo);
                 tabs.SelectedTab = dotNetTabPage;
+				if (!tabs.TabPages.Contains(scriptTabPage))
+					tabs.TabPages.Add(scriptTabPage);
+
+				scriptBox1.ControlInfo = controlInfo;
             }
             else
             {
                 if (tabs.TabPages.Contains(dotNetTabPage))
                     tabs.TabPages.Remove(dotNetTabPage);
                 tabs.SelectedTab = nativeTabPage;
+				if (tabs.TabPages.Contains(scriptTabPage))
+					tabs.TabPages.Remove(scriptTabPage);
+				scriptBox1.ControlInfo = null;
             }
 
             // Update the hwnd box in case we detected .NET properties.

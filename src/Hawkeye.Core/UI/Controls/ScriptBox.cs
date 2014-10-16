@@ -134,6 +134,31 @@ namespace Hawkeye.UI.Controls
 		private void updateControlInfo(IControlInfo info)
 		{
 			_controlInfo = info;
+
+			string[] lines = null;
+
+			if (info != null && info.Control != null)
+			{
+				string controlInjectorLine = String.Format("System.Windows.Forms.Control _target = System.Windows.Forms.Control.FromHandle((IntPtr){0});", _controlInfo.Control.Handle);
+
+				lines = new string[5];
+				lines[0] = "// These lines were injected dynamically to script against the target object with the variable [_target].";
+				lines[1] = controlInjectorLine;
+				lines[2] = "?_target.GetType().FullName";
+				lines[3] = "?_target.Name";
+				lines[4] = "";
+			}
+			else
+			{
+				lines = new string[2];
+				lines[0] = "// No target control info found.";
+				lines[1] = "";
+			}
+
+			txtScript.Lines = lines;
+			txtScript.SelectionStart = txtScript.Text.Length;
+			txtScript.SelectionLength = 0;
+			generate(GenerationMode.All);
 		}
 
 		public IControlInfo ControlInfo

@@ -72,80 +72,9 @@ namespace Hawkeye.Scripting
                 logger.EndLog();
             }
         }
-
-		private MethodInfo[] getPublicMethods(Type t)
-		{
-			List<MethodInfo> result = new List<MethodInfo>();
-
-			foreach (MethodInfo methodInfo in t.GetMethods(BindingFlags.Public | BindingFlags.Instance))
-			{
-				if (!isPropertyGetterOrSetter(methodInfo))
-					result.Add(methodInfo);
-			}
-
-			return result.ToArray();
-		}
-
-        private string[] Inspect(object o)
-        {
-            Type t = o.GetType();
-            if (t != null)
-            {
-                PropertyInfo[] properties = t.GetProperties();//.OrderBy(p => p.Name).ToArray();
-                //var members = t.GetMembers();
-               // var methods = t.GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(p => !isPropertyGetterOrSetter(p)).OrderBy(p => p.Name).ToArray();
-				MethodInfo[] methods = getPublicMethods(t);
-                //var fields = t.GetFields(BindingFlags.Instance);
-                EventInfo[] events = t.GetEvents();//.OrderBy(p => p.Name).ToArray();
-
-                string[] result = new string[properties.Length + methods.Length + events.Length];
-
-                int last = 0;
-
-                for (int i = 0; i < properties.Length; i++)
-			    {
-                    object value = properties[i].GetValue(o, null);
-                    
-                    string valueString = ""(null)"";
-                    if (value != null)
-                        valueString = value.ToString();
-
-                    result[i] = "" [p] "" + properties[i].Name + "" = "" + valueString;
-                    
-			    }
-
-                last += properties.Length;
-
-                for (int i = 0; i < methods.Length; i++)
-			    {
-                    //result[i + last] = "" [m] "" + methods[i].Name + ""("" + string.Join("", "", methods[i].GetParameters().OrderBy(p => p.Position).Select(p => p.ParameterType.Name + "" "" + p.Name))  + "")"";
-					result[i + last] = "" [m] "" + methods[i].Name + ""()"";
-			    }
-
-                last += methods.Length;
-
-                for (int i = 0; i < events.Length; i++)
-			    {
-                    result[i + last] = "" [e] "" + events[i].Name + ""<"" + events[i].EventHandlerType.Name + "">"";
-			    }
-
-                return result;
-            }
-
-            return null;
-        }
-
-        private bool isPropertyGetterOrSetter(MethodInfo mi)
-        {
-            return mi.Name.StartsWith(""set_"") ||
-                mi.Name.StartsWith(""get_"") ||
-                mi.Name.StartsWith(""add_"") ||
-                mi.Name.StartsWith(""remove_"");
-        }
     }
 }
 ";
-
 
         public static string GetSource(string[] lines)
         {
@@ -226,7 +155,7 @@ namespace Hawkeye.Scripting
 						var end = viewString.LastIndexOf(';');
 						if (end > 0)
 							viewString = viewString.Substring(0, end).TrimEnd();
-						viewString = "Inspect(" + viewString + ")";
+						viewString = "RuntimeHelper.Inspect(" + viewString + ")";
 
 						valueString = viewString;
 					}

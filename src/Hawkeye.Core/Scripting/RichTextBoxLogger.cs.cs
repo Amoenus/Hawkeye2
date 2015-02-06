@@ -34,11 +34,6 @@ namespace Hawkeye.Scripting
 
 					foreach (var item in enumerable)
 					{
-						sb.AppendLine(item.ToString());
-					}
-
-					foreach (var item in enumerable)
-					{
 						if (item == null)
 							sb.AppendLine("(null)");
 						else

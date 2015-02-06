@@ -72,6 +72,7 @@
     <Compile Include="Scripting\RichTextBoxLogger.cs.cs" />
     <Compile Include="Scripting\BaseScriptLogger.cs" />
     <Compile Include="Scripting\CSharpScriptCompiler.cs" />
+    <Compile Include="Scripting\RuntimeHelper.cs" />
     <Compile Include="Scripting\ScriptLogger.cs" />
     <Compile Include="Shell.cs" />
     <Compile Include="HawkeyeAttacher.cs" />

@@ -64,7 +64,7 @@ namespace Hawkeye.UI.Controls
 			string code = ScriptLoggerSource.GetSource(lines);
 
 			var res = CSharpScriptCompiler.Compile(code);
-
+			
 			if (res.Errors.HasErrors)
 			{
 				//var errors = res.Errors.OfType<CompilerError>().Select(ce => new ScriptError() { Line = ce.Line, Message = ce.ErrorText }).ToArray();
@@ -141,12 +141,13 @@ namespace Hawkeye.UI.Controls
 			{
 				string controlInjectorLine = String.Format("System.Windows.Forms.Control _target = System.Windows.Forms.Control.FromHandle((IntPtr){0});", _controlInfo.Control.Handle);
 
-				lines = new string[5];
+				lines = new string[6];
 				lines[0] = "// These lines were injected dynamically to script against the target object with the variable [_target].";
 				lines[1] = controlInjectorLine;
 				lines[2] = "?_target.GetType().FullName";
 				lines[3] = "?_target.Name";
-				lines[4] = "";
+				lines[4] = "*_target";
+				lines[5] = "";
 			}
 			else
 			{

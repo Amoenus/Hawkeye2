@@ -69,7 +69,7 @@
     <Compile Include="extensions\TypeExtensions.cs" />
     <Compile Include="HawkeyeApplication.cs" />
     <Compile Include="HawkeyeApplicationInfo.cs" />
-    <Compile Include="Scripting\RichTextBoxLogger.cs.cs" />
+    <Compile Include="Scripting\RichTextBoxLogger.cs" />
     <Compile Include="Scripting\BaseScriptLogger.cs" />
     <Compile Include="Scripting\CSharpScriptCompiler.cs" />
     <Compile Include="Scripting\RuntimeHelper.cs" />

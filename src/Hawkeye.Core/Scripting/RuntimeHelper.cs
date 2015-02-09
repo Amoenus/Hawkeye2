@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hawkeye.Scripting.Proxy;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -7,7 +8,33 @@ namespace Hawkeye.Scripting
 {
 	public static class RuntimeHelper
 	{
+		//public static IScriptCompiler _compiler = null;
+
 		public static string[] Inspect(object o)
+		{
+			IScriptCompiler _compiler = null;
+
+			if (_compiler == null)
+			{
+				try
+				{
+					var compilerType = Type.GetTypeFromCLSID(new Guid("663DB9DE-E53A-4437-A230-7281C0973EF1"));
+					var compiler = Activator.CreateInstance(compilerType);
+					_compiler = (IScriptCompiler)compiler;
+				}
+				catch (Exception ex)
+				{
+					ex.Data["Info"] = "";
+					throw;
+				}
+			}
+
+			//string pingback = _compiler.Ping();
+			return "boom,balsam".Split(new char[] { ',' });
+
+		}
+
+		public static string[] Inspect2(object o)
         {
             Type t = o.GetType();
             if (t != null)

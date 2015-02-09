@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,14 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
@@ -193,6 +202,10 @@
     <ProjectReference Include="..\Hawkeye.Api\Hawkeye.Api.csproj">
       <Project>{854D919B-FABD-4D9B-ADAF-CA94ECAAD70E}</Project>
       <Name>Hawkeye.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Hawkeye.Scripting.Proxy\Hawkeye.Scripting.Proxy.csproj">
+      <Project>{01b2ef41-1afc-4ef7-989f-4f73cc18bec1}</Project>
+      <Name>Hawkeye.Scripting.Proxy</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,8 @@ namespace Hawkeye.UI.Controls
 		private RichTextBox txtLog;
 		private SplitContainer splitContainer1;
 		private int _currentThreadId = -1;
+		private SplitContainer splitContainer2;
+		private RichTextBox txtCode;
 		private IControlInfo _controlInfo = null;
 
 		public ScriptBox() : base()
@@ -63,6 +65,8 @@ namespace Hawkeye.UI.Controls
 
 			string code = ScriptGenerator.GetSource(lines);
 
+			txtCode.Text = code;
+
 			var res = CSharpScriptCompiler.Compile(code);
 			
 			if (res.Errors.HasErrors)
@@ -78,7 +82,11 @@ namespace Hawkeye.UI.Controls
 					var compilerError = item as CompilerError;
 
 					if (compilerError != null)
-						errors.Add(new ScriptError() { Line = compilerError.Line, Message = compilerError.ErrorText });
+					{
+						var error = new ScriptError() { ErrorNumber = compilerError.ErrorNumber, Line = compilerError.Line, Message = compilerError.ErrorText };
+						ScriptErrorExtender.TryExtend(error);
+						errors.Add(error);
+					}
 				}
 
 				logger.ShowErrors(errors.ToArray());
@@ -173,9 +181,14 @@ namespace Hawkeye.UI.Controls
 			this.txtScript = new System.Windows.Forms.RichTextBox();
 			this.txtLog = new System.Windows.Forms.RichTextBox();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.txtCode = new System.Windows.Forms.RichTextBox();
+			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
+			this.splitContainer2.Panel1.SuspendLayout();
+			this.splitContainer2.Panel2.SuspendLayout();
+			this.splitContainer2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// txtScript
@@ -196,7 +209,7 @@ namespace Hawkeye.UI.Controls
 			this.txtLog.Location = new System.Drawing.Point(0, 0);
 			this.txtLog.Name = "txtLog";
 			this.txtLog.ReadOnly = true;
-			this.txtLog.Size = new System.Drawing.Size(589, 180);
+			this.txtLog.Size = new System.Drawing.Size(585, 180);
 			this.txtLog.TabIndex = 1;
 			this.txtLog.Text = "";
 			// 
@@ -213,10 +226,40 @@ namespace Hawkeye.UI.Controls
 			// 
 			// splitContainer1.Panel2
 			// 
-			this.splitContainer1.Panel2.Controls.Add(this.txtLog);
+			this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
 			this.splitContainer1.Size = new System.Drawing.Size(589, 349);
 			this.splitContainer1.SplitterDistance = 165;
 			this.splitContainer1.TabIndex = 2;
+			// 
+			// txtCode
+			// 
+			this.txtCode.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.txtCode.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.txtCode.Location = new System.Drawing.Point(0, 0);
+			this.txtCode.Name = "txtCode";
+			this.txtCode.ReadOnly = true;
+			this.txtCode.Size = new System.Drawing.Size(0, 180);
+			this.txtCode.TabIndex = 2;
+			this.txtCode.Text = "";
+			// 
+			// splitContainer2
+			// 
+			this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+			this.splitContainer2.Location = new System.Drawing.Point(0, 0);
+			this.splitContainer2.Name = "splitContainer2";
+			// 
+			// splitContainer2.Panel1
+			// 
+			this.splitContainer2.Panel1.Controls.Add(this.txtLog);
+			// 
+			// splitContainer2.Panel2
+			// 
+			this.splitContainer2.Panel2.Controls.Add(this.txtCode);
+			this.splitContainer2.Panel2MinSize = 0;
+			this.splitContainer2.Size = new System.Drawing.Size(589, 180);
+			this.splitContainer2.SplitterDistance = 585;
+			this.splitContainer2.TabIndex = 3;
 			// 
 			// ScriptBox
 			// 
@@ -226,6 +269,9 @@ namespace Hawkeye.UI.Controls
 			this.splitContainer1.Panel1.ResumeLayout(false);
 			this.splitContainer1.Panel2.ResumeLayout(false);
 			this.splitContainer1.ResumeLayout(false);
+			this.splitContainer2.Panel1.ResumeLayout(false);
+			this.splitContainer2.Panel2.ResumeLayout(false);
+			this.splitContainer2.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}

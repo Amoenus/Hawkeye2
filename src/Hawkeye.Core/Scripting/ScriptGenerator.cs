@@ -80,8 +80,8 @@ namespace Hawkeye.Scripting
 				{
 					// "!......"
 					string codeString = expressionString.Substring(1);
-					if (!codeString.TrimEnd().EndsWith(";", StringComparison.OrdinalIgnoreCase))
-						codeString += ";";
+					//if (!codeString.TrimEnd().EndsWith(";", StringComparison.OrdinalIgnoreCase))
+					//	codeString += ";";
 					sb.AppendLine(indent + codeString);
 				}
 				else if (expressionString.Length > 1 && expressionString.StartsWith("#"))
@@ -90,8 +90,8 @@ namespace Hawkeye.Scripting
 					string usingString = expressionString.Substring(1).Trim();
 					if (!usingString.StartsWith("using", StringComparison.OrdinalIgnoreCase))
 						usingString = "using " + usingString;
-					if (!usingString.EndsWith(";", StringComparison.OrdinalIgnoreCase))
-						usingString += ";";
+					//if (!usingString.EndsWith(";", StringComparison.OrdinalIgnoreCase))
+					//	usingString += ";";
 					additionalUsings.Add(usingString);
 				}
 				else
@@ -124,8 +124,8 @@ namespace Hawkeye.Scripting
 
 						expressionString = "Inspect: " + viewString;
 
-						if (!viewString.EndsWith(";", StringComparison.OrdinalIgnoreCase))
-							viewString += ";";
+						//if (!viewString.EndsWith(";", StringComparison.OrdinalIgnoreCase))
+						//	viewString += ";";
 
 						var end = viewString.LastIndexOf(';');
 						if (end > 0)
@@ -143,8 +143,8 @@ namespace Hawkeye.Scripting
 					else
 					{
 						// "......"
-						if (!expressionString.TrimEnd().EndsWith(";", StringComparison.OrdinalIgnoreCase))
-							expressionString += ";";
+						//if (!expressionString.TrimEnd().EndsWith(";", StringComparison.OrdinalIgnoreCase))
+						//	expressionString += ";";
 
 						expressionString = AddResolverCode(expressionString);
 

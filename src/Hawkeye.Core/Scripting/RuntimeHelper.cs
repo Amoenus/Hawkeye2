@@ -1,40 +1,17 @@
-﻿using Hawkeye.Scripting.Proxy;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Hawkeye.Scripting
 {
 	public static class RuntimeHelper
 	{
-		//public static IScriptCompiler _compiler = null;
-
 		public static string[] Inspect(object o)
-		{
-			IScriptCompiler _compiler = null;
-
-			if (_compiler == null)
-			{
-				try
-				{
-					var compilerType = Type.GetTypeFromCLSID(new Guid("663DB9DE-E53A-4437-A230-7281C0973EF1"));
-					var compiler = Activator.CreateInstance(compilerType);
-					_compiler = (IScriptCompiler)compiler;
-				}
-				catch (Exception ex)
-				{
-					ex.Data["Info"] = "";
-					throw;
-				}
-			}
-
-			//string pingback = _compiler.Ping();
-			return "boom,balsam".Split(new char[] { ',' });
-
-		}
-
-		public static string[] Inspect2(object o)
         {
             Type t = o.GetType();
             if (t != null)
@@ -82,6 +59,125 @@ namespace Hawkeye.Scripting
 
             return null;
         }
+
+		public static object Resolve(object startObj, string accessor)
+		{
+			string[] accessors = accessor.Split('.');
+
+			if (accessors.Length == 0)
+				return startObj;
+
+			object nextObj = startObj;
+
+			var sb = new StringBuilder();
+			var lastMember = new StringBuilder();
+
+			for (int i = 0; i < accessors.Length; i++)
+			{
+				string member = accessors[i];
+
+				nextObj = GetAccessorValue(nextObj, member);
+
+				//if (i == 0)
+				//	sb.Append(member);
+				//else
+				//{
+				//	if (lastMember.Length > 0)
+				//		lastMember.Append(".");
+				//	lastMember.Append(accessors[i - 1]);
+
+				//	sb.AppendFormat(".GetType().GetProperty(\"{0}\").GetValue({1}, null)", member, lastMember.ToString());
+				//}
+			}
+
+			return nextObj;
+		}
+
+		private static object GetAccessorValue(object obj, string member, object[] indexer = null)
+		{
+			return GetAccessorValue(obj, obj.GetType(), member, indexer);
+		}
+
+		private static object GetAccessorValue(object obj, Type t, string member, object[] indexer = null)
+		{
+
+			if (member.EndsWith(")"))
+				return GetMethodValue(obj, t, member);
+
+			if (member.EndsWith("]"))
+				return GetIndexedValue(obj, t, member);
+
+			var pi = t.GetProperty(member);
+			if (pi != null)
+				return pi.GetValue(obj, indexer);
+
+			var fi = t.GetField(member);
+			if (fi != null)
+				return fi.GetValue(obj);
+
+			//var mi = t.GetMethod(member);
+			//if (mi != null)
+			//	return mi.Invoke(obj, null);
+
+			return null;
+		}
+
+		private static object GetMethodValue(object obj, Type t, string member)
+		{
+			var firstStop = member.IndexOf('(');
+			var argumentsMatch = Regex.Match(member, @"\(.*(\w+).*\)");
+
+			var methodName = member.Substring(0, firstStop);
+
+			var mi = t.GetMethod(methodName);
+			if (mi != null)
+				return mi.Invoke(obj, null);
+
+			return null;
+		}
+
+		private static object GetIndexedValue(object obj, Type t, string member)
+		{
+			var firstStop = member.IndexOf('[');
+			object[] arguments = null;
+			var argumentsMatch = Regex.Match(member, @"\[.*(\w+).*\]");
+			if (argumentsMatch.Success)
+			{
+				string a = argumentsMatch.ToString();
+				a = a.Substring(1, a.Length - 2);
+				arguments = a.Split('.').Select(x => ChangeType(x)).ToArray();
+			}
+
+			member = member.Substring(0, firstStop);
+
+			object resolvedObj = GetAccessorValue(obj, t, member);
+			var memberInfo = resolvedObj.GetType().GetDefaultMembers().FirstOrDefault();
+			if (memberInfo != null)
+				return GetAccessorValue(resolvedObj, memberInfo.Name, arguments);
+
+			return null;
+		}
+
+		private static object ChangeType(string value)
+		{
+			int a;
+			if (int.TryParse(value, out a))
+				return a;
+
+			bool b;
+			if (bool.TryParse(value, out b))
+				return b;
+
+			char c;
+			if (char.TryParse(value, out c))
+				return c;
+
+			double d;
+			if (double.TryParse(value, out d))
+				return d;
+
+			return value;
+		}
 
 		public static MethodInfo[] GetMethods(Type t)
 		{

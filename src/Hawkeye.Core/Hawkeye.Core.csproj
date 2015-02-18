@@ -82,6 +82,7 @@
     <Compile Include="Scripting\BaseScriptLogger.cs" />
     <Compile Include="Scripting\CSharpScriptCompiler.cs" />
     <Compile Include="Scripting\RuntimeHelper.cs" />
+    <Compile Include="Scripting\ScriptGenerator.cs" />
     <Compile Include="Scripting\ScriptLogger.cs" />
     <Compile Include="Shell.cs" />
     <Compile Include="HawkeyeAttacher.cs" />
@@ -202,10 +203,6 @@
     <ProjectReference Include="..\Hawkeye.Api\Hawkeye.Api.csproj">
       <Project>{854D919B-FABD-4D9B-ADAF-CA94ECAAD70E}</Project>
       <Name>Hawkeye.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Hawkeye.Scripting.Proxy\Hawkeye.Scripting.Proxy.csproj">
-      <Project>{01b2ef41-1afc-4ef7-989f-4f73cc18bec1}</Project>
-      <Name>Hawkeye.Scripting.Proxy</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -61,7 +61,7 @@ namespace Hawkeye.UI.Controls
 			if (mode == GenerationMode.Selection)
 				lines = txtScript.SelectedText.Split(new string[] { "\n" }, StringSplitOptions.None);
 
-			string code = ScriptLoggerSource.GetSource(lines);
+			string code = ScriptGenerator.GetSource(lines);
 
 			var res = CSharpScriptCompiler.Compile(code);
 			

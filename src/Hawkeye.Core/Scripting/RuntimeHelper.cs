@@ -16,11 +16,11 @@ namespace Hawkeye.Scripting
             Type t = o.GetType();
             if (t != null)
             {
-				PropertyInfo[] properties = GetProperties(t);
+				PropertyInfo[] properties = t.GetProperties().OrderBy(p => p.Name).ToArray();
                 //var members = t.GetMembers();
 				MethodInfo[] methods = GetMethods(t);
                 //var fields = t.GetFields(BindingFlags.Instance);
-                EventInfo[] events = GetEvents(t);
+                EventInfo[] events = t.GetEvents().OrderBy(e => e.Name).ToArray();
 
                 string[] result = new string[properties.Length + methods.Length + events.Length];
 
@@ -29,10 +29,15 @@ namespace Hawkeye.Scripting
                 for (int i = 0; i < properties.Length; i++)
 			    {
                     object value = properties[i].GetValue(o, null);
-                    
+					
                     string valueString = "(null)";
-                    if (value != null)
-                        valueString = value.ToString();
+					if (value != null)
+					{
+						if (value is char && char.IsControl((char)value))
+							valueString = "0x" + Convert.ToByte((char)value).ToString("X2");
+						else
+							valueString = value.ToString().Replace(@"\", @"\\");
+					}
 
                     result[i] = " [p] " + properties[i].Name + " = " + valueString;
                     
@@ -188,7 +193,6 @@ namespace Hawkeye.Scripting
 				if (!GetIsPropertyGetterOrSetter(methodInfo))
 					result.Add(methodInfo);
 			}
-			result.Sort(new MethodInfoComparer());
 
 			return result.ToArray();
 		}
@@ -196,12 +200,10 @@ namespace Hawkeye.Scripting
 		public static string[] GetMethodParameters(MethodInfo method)
 		{
 			// methods[i].GetParameters().OrderBy(p => p.Position).Select(p => p.ParameterType.Name + "" "" + p.Name))
-			List<ParameterInfo> parameters = new List<ParameterInfo>(method.GetParameters());
+			List<ParameterInfo> parameters = method.GetParameters().OrderBy(p => p.Position).ToList();
 
 			if (parameters.Count == 0)
 				return new string[0];
-
-			parameters.Sort(new ParameterInfoComparer());
 
 			string[] result = new string[parameters.Count - 1];
 			for (int i = 0; i < parameters.Count - 1; i++)
@@ -212,24 +214,6 @@ namespace Hawkeye.Scripting
 			return result;
 		}
 
-		public static PropertyInfo[] GetProperties(Type t)
-		{
-			List<PropertyInfo> result = new List<PropertyInfo>(t.GetProperties());
-
-			result.Sort(new PropertyInfoComparer());
-
-			return result.ToArray();
-		}
-
-		public static EventInfo[] GetEvents(Type t)
-		{
-			List<EventInfo> result = new List<EventInfo>(t.GetEvents());
-
-			result.Sort(new EventInfoComparer());
-
-			return result.ToArray();
-		}
-
 		public static bool GetIsPropertyGetterOrSetter(MethodInfo mi)
         {
             return mi.Name.StartsWith("set_") ||
@@ -238,36 +222,4 @@ namespace Hawkeye.Scripting
                 mi.Name.StartsWith("remove_");
         }
     }
-
-	public class PropertyInfoComparer : IComparer<PropertyInfo>
-	{
-		public int Compare(PropertyInfo x, PropertyInfo y)
-		{
-			return x.Name.CompareTo(y.Name);
-		}
-	}
-
-	public class MethodInfoComparer : IComparer<MethodInfo>
-	{
-		public int Compare(MethodInfo x, MethodInfo y)
-		{
-			return x.Name.CompareTo(y.Name);
-		}
-	}
-
-	public class EventInfoComparer : IComparer<EventInfo>
-	{
-		public int Compare(EventInfo x, EventInfo y)
-		{
-			return x.Name.CompareTo(y.Name);
-		}
-	}
-
-	public class ParameterInfoComparer : IComparer<ParameterInfo>
-	{
-		public int Compare(ParameterInfo x, ParameterInfo y)
-		{
-			return x.Position.CompareTo(y.Position);
-		}
-	}
 }

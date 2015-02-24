@@ -7,17 +7,17 @@ namespace Hawkeye.Scripting
 {
 	public static class ScriptGenerator
 	{
-		// TODO: Sort methods, properties and fields and re-add the argument information for inspected methods
-
 		private const string SOURCE = @"
 using System;
-//using System.IO;
-//using System.Linq;
+using System.IO;
 using System.Text;
 using System.Reflection;
 using System.Drawing;
 using System.Collections;
 using System.Collections.Generic;
+using Hawkeye.Scripting.Errors;
+using Hawkeye.Scripting.Interfaces;
+using Hawkeye.Scripting.Loggers;
 %USINGS%
 
 namespace Hawkeye.Scripting

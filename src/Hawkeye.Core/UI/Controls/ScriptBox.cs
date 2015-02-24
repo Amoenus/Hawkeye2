@@ -1,4 +1,7 @@
 ﻿using Hawkeye.Scripting;
+using Hawkeye.Scripting.Errors;
+using Hawkeye.Scripting.Interfaces;
+using Hawkeye.Scripting.Loggers;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;

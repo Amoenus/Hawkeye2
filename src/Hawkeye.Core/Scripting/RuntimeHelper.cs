@@ -16,54 +16,69 @@ namespace Hawkeye.Scripting
             Type t = o.GetType();
             if (t != null)
             {
-				PropertyInfo[] properties = t.GetProperties().OrderBy(p => p.Name).ToArray();
-                //var members = t.GetMembers();
-				MethodInfo[] methods = GetMethods(t);
-                //var fields = t.GetFields(BindingFlags.Instance);
-                EventInfo[] events = t.GetEvents().OrderBy(e => e.Name).ToArray();
+				var list = new List<string>();
+				var bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+				
+				var members = t.GetMembers(bindingFlags).OrderBy(m => m.MemberType).ThenBy(m => m.Name);
+				var methods = t.GetMethods(bindingFlags);
 
-                string[] result = new string[properties.Length + methods.Length + events.Length];
+				var longestMemberCategory = members.Max(m => m.MemberType.ToString().Length);
 
-                int last = 0;
+				foreach (var member in members)
+				{
+					BindingFlags memberBindingFlags = (BindingFlags)member.GetType().GetProperty("BindingFlags", bindingFlags).GetValue(member, null);
+					bool isPrivate = (memberBindingFlags & BindingFlags.NonPublic) == BindingFlags.NonPublic;
 
-                for (int i = 0; i < properties.Length; i++)
-			    {
-                    object value = properties[i].GetValue(o, null);
-					
-                    string valueString = "(null)";
-					if (value != null)
+					bool skip = false;
+					string memberName = member.Name;
+
+					if (member.MemberType == MemberTypes.Method)
 					{
-						if (value is char && char.IsControl((char)value))
-							valueString = "0x" + Convert.ToByte((char)value).ToString("X2");
-						else
-							valueString = value.ToString().Replace(@"\", @"\\");
+						skip = true;
+						if (!GetIsPropertyGetterOrSetter(memberName))
+						{
+							var methodInfos = methods.Where(m => m.Name == memberName).ToArray();
+
+							foreach (var mi in methodInfos)
+							{
+								memberName += "(" + string.Join(", ", GetMethodParameters(mi)) + ")";
+								AddMember(ref list, longestMemberCategory, MemberTypes.Method, isPrivate, memberName);
+							}
+						}
 					}
 
-                    result[i] = " [p] " + properties[i].Name + " = " + valueString;
-                    
-			    }
+					if (!skip)
+						AddMember(ref list, longestMemberCategory, member, isPrivate, memberName);
+				}
 
-                last += properties.Length;
-
-                for (int i = 0; i < methods.Length; i++)
-			    {
-                    //result[i + last] = "" [m] "" + methods[i].Name + ""("" + string.Join("", "", methods[i].GetParameters().OrderBy(p => p.Position).Select(p => p.ParameterType.Name + "" "" + p.Name))  + "")"";
-					result[i + last] = " [m] " + methods[i].Name + "(" + string.Join(", ", GetMethodParameters(methods[i]))  + ")";
-					//result[i + last] = "" [m] "" + methods[i].Name + ""()"";
-			    }
-
-                last += methods.Length;
-
-                for (int i = 0; i < events.Length; i++)
-			    {
-                    result[i + last] = " [e] " + events[i].Name + "<" + events[i].EventHandlerType.Name + ">";
-			    }
-
-                return result;
+				return list.ToArray();
             }
 
             return null;
         }
+
+		private static void AddMember(ref List<string> list, int longestMemberCategory, MemberInfo member, bool isPrivate, string memberName)
+		{
+			AddMember(ref list, longestMemberCategory, member.MemberType, isPrivate, memberName);
+		}
+
+		private static void AddMember(ref List<string> list, int longestMemberCategory, MemberTypes memberType, bool isPrivate, string memberName)
+		{
+			string memberCategory = (memberType.ToString() + ":").PadRight(longestMemberCategory + 1, ' ');
+			list.Add(string.Format("[{0}] {1} {2}", isPrivate ? "-" : "+", memberCategory, memberName));
+		}
+
+		private static string getMemberValueString(object value)
+		{
+			if (value != null)
+			{
+				if (value is char && char.IsControl((char)value))
+					return "0x" + Convert.ToByte((char)value).ToString("X2");
+				else
+					return value.ToString().Replace(@"\", @"\\");
+			}
+			return "(null)";
+		}
 
 		public static object Resolve(object startObj, string accessor)
 		{
@@ -190,7 +205,7 @@ namespace Hawkeye.Scripting
 
 			foreach (MethodInfo methodInfo in t.GetMethods(BindingFlags.Public | BindingFlags.Instance))
 			{
-				if (!GetIsPropertyGetterOrSetter(methodInfo))
+				if (!GetIsPropertyGetterOrSetter(methodInfo.Name))
 					result.Add(methodInfo);
 			}
 
@@ -214,12 +229,12 @@ namespace Hawkeye.Scripting
 			return result;
 		}
 
-		public static bool GetIsPropertyGetterOrSetter(MethodInfo mi)
+		public static bool GetIsPropertyGetterOrSetter(string methodName)
         {
-            return mi.Name.StartsWith("set_") ||
-                mi.Name.StartsWith("get_") ||
-                mi.Name.StartsWith("add_") ||
-                mi.Name.StartsWith("remove_");
+			return methodName.StartsWith("set_") ||
+				methodName.StartsWith("get_") ||
+				methodName.StartsWith("add_") ||
+				methodName.StartsWith("remove_");
         }
     }
 }

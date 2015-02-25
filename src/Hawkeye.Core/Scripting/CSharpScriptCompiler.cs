@@ -9,7 +9,7 @@ namespace Hawkeye.Scripting
 {
 	public static class CSharpScriptCompiler
 	{
-		public static CompilerResults Compile(string code)
+		public static CompilerResults Compile(SourceInfo sourceInfo)
 		{
 			var c = new CSharpCodeProvider();
 			var p = new CompilerParameters();
@@ -26,9 +26,12 @@ namespace Hawkeye.Scripting
 			p.ReferencedAssemblies.Add("System.Windows.Forms.dll");
 			p.ReferencedAssemblies.Add(rf.Location);
 
+			foreach (var reference in sourceInfo.References)
+				p.ReferencedAssemblies.Add(reference);
+
 			p.GenerateExecutable = false;
 			p.GenerateInMemory = true;
-			return c.CompileAssemblyFromSource(p, code);
+			return c.CompileAssemblyFromSource(p, sourceInfo.SourceCode);
 		}
 	}
 }

@@ -51,9 +51,9 @@ namespace Hawkeye.Scripting
 }
 ";
 
-		public static string GetSource(string[] lines)
+		public static SourceInfo GetSource(string[] lines)
 		{
-			List<string> additionalUsings = new List<string>();
+			var info = new SourceInfo();
 
 			string indent = "\t\t";
 
@@ -92,7 +92,15 @@ namespace Hawkeye.Scripting
 						usingString = "using " + usingString;
 					//if (!usingString.EndsWith(";", StringComparison.OrdinalIgnoreCase))
 					//	usingString += ";";
-					additionalUsings.Add(usingString);
+					if (!info.Usings.Contains(usingString))
+						info.Usings.Add(usingString);
+				}
+				else if (expressionString.Length > 1 && expressionString.StartsWith("$"))
+				{
+					// insert namespace "$System.Windows.Forms.dll"
+					string reference = expressionString.Substring(1).Trim();
+					if (!info.References.Contains(reference))
+						info.References.Add(reference);
 				}
 				else
 				{
@@ -172,7 +180,11 @@ namespace Hawkeye.Scripting
 
 			}
 
-			return GetSource(sb.ToString(), additionalUsings.ToArray());
+			info.SourceCode = sb.ToString();
+
+			ResolveSource(ref info);
+
+			return info;
 		}
 
 		private static string AddResolverCode(string codeline)
@@ -194,13 +206,13 @@ namespace Hawkeye.Scripting
 			return codeline;
 		}
 
-		public static string GetSource(string lines, params string[] additionalUsings)
+		public static void ResolveSource(ref SourceInfo sourceInfo)
 		{
 			string usingString = "";
-			if (additionalUsings != null && additionalUsings.Any())
-				usingString = string.Join(Environment.NewLine, additionalUsings);
+			if (sourceInfo.Usings.Any())
+				usingString = string.Join(Environment.NewLine, sourceInfo.Usings.ToArray());
 
-			return SOURCE.Replace("%LINES%", lines).Replace("%USINGS%", usingString);
+			sourceInfo.SourceCode = SOURCE.Replace("%LINES%", sourceInfo.SourceCode).Replace("%USINGS%", usingString);
 		}
 
 

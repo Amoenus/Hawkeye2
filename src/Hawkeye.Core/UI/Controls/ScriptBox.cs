@@ -66,18 +66,14 @@ namespace Hawkeye.UI.Controls
 			if (mode == GenerationMode.Selection)
 				lines = txtScript.SelectedText.Split(new string[] { "\n" }, StringSplitOptions.None);
 
-			string code = ScriptGenerator.GetSource(lines);
+			SourceInfo info = ScriptGenerator.GetSource(lines);
 
-			txtCode.Text = code;
+			txtCode.Text = info.SourceCode;
 
-			var res = CSharpScriptCompiler.Compile(code);
-			
+			var res = CSharpScriptCompiler.Compile(info);
+
 			if (res.Errors.HasErrors)
 			{
-				//var errors = res.Errors.OfType<CompilerError>().Select(ce => new ScriptError() { Line = ce.Line, Message = ce.ErrorText }).ToArray();
-
-				// #lambda
-
 				var errors = new List<ScriptError>();
 
 				foreach (var item in res.Errors)
@@ -95,7 +91,16 @@ namespace Hawkeye.UI.Controls
 				logger.ShowErrors(errors.ToArray());
 			}
 			else
-				testCode(res.CompiledAssembly, logger);
+			{
+				try
+				{
+					testCode(res.CompiledAssembly, logger);
+				}
+				catch (Exception ex)
+				{
+					logger.ShowErrors(ex);
+				}
+			}
 		}
 
 
@@ -106,8 +111,6 @@ namespace Hawkeye.UI.Controls
 
 		private void showErrors(List<CompilerError> list)
 		{
-			// #lambda string message = string.Join(Environment.NewLine, list.Select(e => e.ErrorText));
-
 			var sb = new StringBuilder();
 			foreach (var item in list)
 				sb.AppendLine(item.ErrorText);
@@ -117,7 +120,6 @@ namespace Hawkeye.UI.Controls
 
 		private void testCode(Assembly assembly, IScriptLogger logger)
 		{
-			//var scriptLoggerType = assembly.GetTypes().FirstOrDefault(t => t.GetInterfaces().Any(i => i.Equals(typeof(IScriptLoggerHost))));
 			var scriptLoggerType = GetFirstLoggerHost(assembly.GetTypes());
 			if (scriptLoggerType != null)
 			{

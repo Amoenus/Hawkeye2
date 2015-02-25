@@ -65,6 +65,9 @@ namespace Hawkeye.Extensibility
             }
         }
 
+		/// <summary>
+		/// Is raised to enable plugins to check if they can get executed
+		/// </summary>
         public event EventHandler CanExecuteChanged;
 
         #endregion
@@ -85,6 +88,10 @@ namespace Hawkeye.Extensibility
             return false;
         }
 
+		/// <summary>
+		/// Raises the event to enable plugins to check if they can get executed
+		/// </summary>
+		/// <param name="sender">The sender.</param>
         protected void RaiseCanExecuteChanged(object sender)
         {
             if (CanExecuteChanged != null)

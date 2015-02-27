@@ -189,9 +189,10 @@ namespace Hawkeye.Scripting
 
 		private static string AddResolverCode(string codeline)
 		{
-			if (codeline.StartsWith("!(") && codeline.EndsWith(")"))
+			if (codeline.Contains('!'))
+			//if (codeline.StartsWith("!(") && codeline.EndsWith(")"))
 			{
-				codeline = codeline.Substring(2, codeline.Length - 3);
+				//codeline = codeline.Substring(2, codeline.Length - 3);
 
 				//valueString = Terminulate(valueString);
 				int firstDot = codeline.IndexOf('.');

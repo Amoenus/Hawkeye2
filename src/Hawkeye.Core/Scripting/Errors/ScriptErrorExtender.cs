@@ -11,7 +11,7 @@ namespace Hawkeye.Scripting.Errors
 		static ScriptErrorExtender()
 		{
 			_additions = new Dictionary<string, string>();
-			_additions.Add("CS0117", "Try encapsulating the term with \"!(...)\"");
+			_additions.Add("CS0117", "Try a leading \"!\" to enforce the resolver to check a member, like \"?_target.Tag.!Name.Length\" if _target.Tag is of type object containing a value having a property \"Name\".");
 		}
 
 		public static void TryExtend(ScriptError error)

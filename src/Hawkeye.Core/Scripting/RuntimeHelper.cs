@@ -26,8 +26,14 @@ namespace Hawkeye.Scripting
 
 				foreach (var member in members)
 				{
-					BindingFlags memberBindingFlags = (BindingFlags)member.GetType().GetProperty("BindingFlags", bindingFlags).GetValue(member, null);
-					bool isPrivate = (memberBindingFlags & BindingFlags.NonPublic) == BindingFlags.NonPublic;
+					bool isPrivate = true;
+
+					var pi = member.GetType().GetProperty("BindingFlags", bindingFlags);
+					if (pi != null)
+					{
+						BindingFlags memberBindingFlags = (BindingFlags)pi.GetValue(member, null);
+						isPrivate = (memberBindingFlags & BindingFlags.NonPublic) == BindingFlags.NonPublic;
+					}
 
 					bool skip = false;
 					string memberName = member.Name;
@@ -95,6 +101,9 @@ namespace Hawkeye.Scripting
 			for (int i = 0; i < accessors.Length; i++)
 			{
 				string member = accessors[i];
+
+				if (member.StartsWith("!"))
+					member = member.Substring(1);
 
 				nextObj = GetAccessorValue(nextObj, member);
 

@@ -154,8 +154,6 @@ namespace Hawkeye.Scripting
 						//if (!expressionString.TrimEnd().EndsWith(";", StringComparison.OrdinalIgnoreCase))
 						//	expressionString += ";";
 
-						expressionString = AddResolverCode(expressionString);
-
 						sb.AppendLine(indent + expressionString);
 						useLogger = false;
 					}
@@ -164,17 +162,18 @@ namespace Hawkeye.Scripting
 					{
 						expressionString = expressionString.Replace("\"", "\\" + "\"");
 
-						//int firstDot = valueString.IndexOf('.');
-						//if (firstDot > -1 && !valueString.Contains("RuntimeHelper"))
-						//{
-						//	string objectName = valueString.Substring(0, firstDot);
-						//	string accessors = valueString.Substring(firstDot + 1);
-						//	valueString = string.Format("RuntimeHelper.Resolve({0}, \"{1}\")", objectName, accessors);
-						//}
+						if (expressionString.Contains(".!"))
+						{
+							var resolvedLines = RuntimeHelper.Resolve2(expressionString);
+							for (int i = 0; i < resolvedLines.Count - 1; i++)
+								sb.AppendLine(indent + resolvedLines[i]);
+							sb.AppendLine(string.Format(indent + "logger.TryLog(\"{0}\", {1});", expressionString, resolvedLines.Last()));
+						}
+						else
+						{
+							sb.AppendLine(string.Format(indent + "logger.TryLog(\"{0}\", {1});", expressionString, valueString));
+						}
 
-						valueString = AddResolverCode(valueString);
-
-						sb.AppendLine(string.Format(indent + "logger.TryLog(\"{0}\", {1});", expressionString, valueString));
 					}
 				}
 
@@ -187,25 +186,6 @@ namespace Hawkeye.Scripting
 			return info;
 		}
 
-		private static string AddResolverCode(string codeline)
-		{
-			if (codeline.Contains('!'))
-			//if (codeline.StartsWith("!(") && codeline.EndsWith(")"))
-			{
-				//codeline = codeline.Substring(2, codeline.Length - 3);
-
-				//valueString = Terminulate(valueString);
-				int firstDot = codeline.IndexOf('.');
-				if (firstDot > -1 && !codeline.Contains("RuntimeHelper"))
-				{
-					string objectName = codeline.Substring(0, firstDot);
-					string accessors = codeline.Substring(firstDot + 1);
-					return string.Format("RuntimeHelper.Resolve({0}, \"{1}\")", objectName, accessors);
-				}	
-			}
-
-			return codeline;
-		}
 
 		public static void ResolveSource(ref SourceInfo sourceInfo)
 		{

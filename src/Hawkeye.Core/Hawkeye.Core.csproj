@@ -121,9 +121,7 @@
     <Compile Include="UI\Controls\CustomTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UI\Controls\PropertyGridEx.ComponentModel.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="UI\Controls\PropertyGridEx.ComponentModel.cs" />
     <Compile Include="ComponentModel\descriptors\TypePropertyDescriptor.cs" />
     <Compile Include="UI\Controls\PropertyGridEx.searchBox.cs">
       <SubType>Component</SubType>
@@ -190,12 +188,8 @@
     <Compile Include="ComponentModel\WindowInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UI\Controls\PropertyGridEx.ObjectWrapper.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="UI\Controls\PropertyGridEx.InnerPropertyDescriptor.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="UI\Controls\PropertyGridEx.ObjectWrapper.cs" />
+    <Compile Include="UI\Controls\PropertyGridEx.InnerPropertyDescriptor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hawkeye.Api\Hawkeye.Api.csproj">

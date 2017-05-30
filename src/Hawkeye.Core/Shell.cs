@@ -28,7 +28,7 @@ namespace Hawkeye
         {
             hawkeyeId = Guid.NewGuid();
             ApplicationInfo = new HawkeyeApplicationInfo();
-            
+
             // Do nothing else here, otherwise, HawkeyeApplication static constructor may fail.
         }
 
@@ -57,10 +57,10 @@ namespace Hawkeye
 
         public IWindowInfo CurrentWindowInfo
         {
-            get 
+            get
             {
-                return mainControl == null ? 
-                    null : mainControl.CurrentInfo; 
+                return mainControl == null ?
+                    null : mainControl.CurrentInfo;
             }
         }
 
@@ -92,10 +92,10 @@ namespace Hawkeye
 
             var appId = hawkeyeId.GetHashCode();
             LogInfo("Running Hawkeye in its own process.", appId);
-            LogDebug(string.Format("Parameters: {0}, {1}.", windowToSpy, windowToKill), appId);
+            LogDebug($"Parameters: {windowToSpy}, {windowToKill}.", appId);
             Initialize();
             LogDebug("Hawkeye initialization is complete", appId);
-            
+
             InitializeMainForm(windowToSpy);
             LogDebug("Hawkeye Main Form initialization is complete", appId);
 
@@ -112,7 +112,7 @@ namespace Hawkeye
             // Save settings & layout
             SettingsManager.Save();
 
-            // Release resources (the log file for example) held by log4net.                
+            // Release resources (the log file for example) held by log4net.
             LogManager.Shutdown();
         }
 
@@ -158,22 +158,22 @@ namespace Hawkeye
             var arguments = new string[]
                 {
                     handle.ToString(),                                      // Target window
-                    mainForm.Handle.ToString(),                             // Original Hawkeye 
+                    mainForm.Handle.ToString(),                             // Original Hawkeye
                     "\"" + hawkeyeAttacherType.Assembly.Location + "\"",    // This assembly
                     "\"" + hawkeyeAttacherType.FullName + "\"",             // The name of the class responsible for attaching to the process
                     "Attach"                                                // Attach method
                 };
 
             var args = string.Join(" ", arguments);
-            var pinfo = new ProcessStartInfo(bootstrapExecutable, args);
+            var startInfo = new ProcessStartInfo(bootstrapExecutable, args);
 
-            LogInfo(string.Format("Starting a new instance of Hawkeye: {0}", bootstrapExecutable));
-            LogDebug(string.Format("Command is: {0} {1}", bootstrapExecutable, args));
+            LogInfo($"Starting a new instance of Hawkeye: {bootstrapExecutable}");
+            LogDebug($"Command is: {bootstrapExecutable} {args}");
 
             // Close Hawkeye; i.e. clean everything beore it is really killed in the Attach method.
             Close();
 
-            Process.Start(pinfo);
+            Process.Start(startInfo);
         }
 
         /// <summary>
@@ -195,8 +195,7 @@ namespace Hawkeye
             NativeMethods.GetWindowThreadProcessId(windowToSpy, out pid);
 
             var appId = hawkeyeId.GetHashCode();
-            LogInfo(string.Format("Running Hawkeye attached to application {0} (pid={1})",
-                Application.ProductName, pid), appId);
+            LogInfo($"Running Hawkeye attached to application {Application.ProductName} (pid={pid})", appId);
             Initialize();
             LogDebug("Hawkeye initialization is complete", appId);
 
@@ -226,7 +225,7 @@ namespace Hawkeye
 
             return logFactory;
         }
-        
+
         private void Initialize()
         {
             // Load Hawkeye settings
@@ -243,7 +242,7 @@ namespace Hawkeye
             PluginManager.LoadAll(this);
             int loadedCount = PluginManager.Plugins.Length;
 
-            LogDebug(string.Format("{0}/{1} Hawkeye plugins were successfully loaded.", loadedCount, discoveredCount));
+            LogDebug($"{loadedCount}/{discoveredCount} Hawkeye plugins were successfully loaded.");
         }
 
         private void InitializeMainForm(IntPtr windowToSpy)
@@ -262,8 +261,7 @@ namespace Hawkeye
 
         private void RaiseCurrentWindowInfoChanged()
         {
-            if (CurrentWindowInfoChanged != null)
-                CurrentWindowInfoChanged(this, EventArgs.Empty);
+            CurrentWindowInfoChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private static string GetBootstrap(Clr clr, Bitness bitness)
@@ -273,8 +271,7 @@ namespace Hawkeye
             {
                 case Bitness.x86: bitnessVersion = "x86"; break;
                 case Bitness.x64: bitnessVersion = "x64"; break;
-                default: throw new ArgumentException(string.Format(
-                    "Bitness Value {0} is invalid.", bitness), "bitness");
+                default: throw new ArgumentException($"Bitness Value {bitness} is invalid.", "bitness");
             }
 
             var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -282,7 +279,7 @@ namespace Hawkeye
             // Very special case: Hawkeye is x86 and the spied process is x64: we can't know for sure
             // whether the process is .NET 2 or 4 or none.
             // So, we must simply re-run Hawkeye.exe (which is compiled as Any Cpu and therefore
-            // will run as x64 in a x64 environment) passing it the handle of the spied window so that another 
+            // will run as x64 in a x64 environment) passing it the handle of the spied window so that another
             // detection is achieved, this time from a x64 process.
             // Note that because we run Hawkeye.exe, we won't inject anything.
             if (clr == Clr.Undefined && HawkeyeApplication.CurrentBitness == Bitness.x86 && bitness == Bitness.x64)
@@ -294,10 +291,10 @@ namespace Hawkeye
                 case Clr.Net2: clrVersion = "N2"; break;
                 case Clr.Net4: clrVersion = "N4"; break;
                 default: throw new ArgumentException(
-                    string.Format("Clr Value {0} is invalid.", clr), "clr");
+                    $"Clr Value {clr} is invalid.", nameof(clr));
             }
 
-            var exe = string.Format("HawkeyeBootstrap{0}{1}.exe", clrVersion, bitnessVersion);
+            var exe = $"HawkeyeBootstrap{clrVersion}{bitnessVersion}.exe";
             return Path.Combine(directory, exe);
         }
 

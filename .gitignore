@@ -110,3 +110,5 @@ UpgradeLog*.XML
 /src/packages/ScriptCs.Core.0.13.2
 /src/packages/ScriptCs.Engine.Roslyn.0.13.2
 /src/packages/ScriptCs.Contracts.0.13.2
+/src/Hawkeye.VC.VC.opendb
+/src/Hawkeye.VC.db

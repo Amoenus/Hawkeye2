@@ -91,7 +91,7 @@
     <Compile Include="Shell.cs" />
     <Compile Include="HawkeyeAttacher.cs" />
     <Compile Include="Logging\BaseLogService.cs" />
-    <Compile Include="Logging\interfaces.cs" />
+    <Compile Include="Logging\Interfaces.cs" />
     <Compile Include="Logging\LogEntry.cs" />
     <Compile Include="Logging\LogManager.cs" />
     <Compile Include="Logging\LogManager.Debug.cs" />

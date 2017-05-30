@@ -1,11 +1,12 @@
-﻿using log4net.Core;
+﻿using Hawkeye.Extensions;
+using log4net.Core;
 
 namespace Hawkeye.Logging.log4net
 {
     internal static class Log4NetHelper
     {
         /// <summary>
-        /// Converts a Sopra flavor trace level (<see cref="Siti.Logging.LogLevel"/>)
+        /// Converts a Sopra flavor trace level (<see cref="LogLevel"/>)
         /// into a log4net like level (<see cref="E:log4net.Core.Level"/>).
         /// </summary>
         /// <param name="level">The trace level to convert.</param>
@@ -29,7 +30,7 @@ namespace Hawkeye.Logging.log4net
 
         /// <summary>
         /// Converts a log4net flavor trace level (<see cref="E:log4net.Core.Level"/>)
-        /// into a Sopra like level (<see cref="Siti.Logging.LogLevel"/>).
+        /// into a Sopra like level (<see cref="LogLevel"/>).
         /// </summary>
         /// <param name="level">The log4net level to convert.</param>
         /// <returns>Sopra converted trace level.</returns>
@@ -47,15 +48,15 @@ namespace Hawkeye.Logging.log4net
         }
 
         /// <summary>
-        /// Loggings a log4net flavor logging event (<see cref="log4net.Core.LoggingEvent"/>)
-        /// into a Sopra Log entry (<see cref="Siti.Logging.LogEntry"/>).
+        /// Loggings a log4net flavor logging event (<see cref="LoggingEvent"/>)
+        /// into a Sopra Log entry (<see cref="LogEntry"/>).
         /// </summary>
         /// <param name="loggingEvent">The logging event.</param>
         /// <returns></returns>
         public static LogEntry LoggingEventToLogEntry(LoggingEvent loggingEvent)
         {
             if (loggingEvent == null) return null;
-            
+
             var message = loggingEvent.MessageObject == null ?
                 loggingEvent.RenderedMessage : loggingEvent.MessageObject.ToString();
 
@@ -79,7 +80,7 @@ namespace Hawkeye.Logging.log4net
                 new LoggingEventData()
                 {
                     ExceptionString = entry.Exception.ToFormattedString(),
-                    Level = LogLevelToLog4NetLevel(entry.Level),                    
+                    Level = LogLevelToLog4NetLevel(entry.Level),
                     Message = entry.Message,
                     LoggerName = entry.Source,
                     TimeStamp = entry.TimeStamp

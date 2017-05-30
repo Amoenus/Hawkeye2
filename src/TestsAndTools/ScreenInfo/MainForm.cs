@@ -5,6 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace ScreenInfo
 {
+    /// <summary>
+    /// Main Form
+    /// </summary>
     public partial class MainForm : Form
     {
         #region System Menu
@@ -61,7 +64,7 @@ namespace ScreenInfo
         {
             InitializeComponent();
         }
-        
+
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Forms.Form.Load" /> event.
         /// </summary>
@@ -100,8 +103,8 @@ namespace ScreenInfo
             minimizedCheckBox.Checked = WindowState == FormWindowState.Minimized;
             clientRectangleTextBox.Text = ClientRectangle.ToString();
             clientRectangleInScreenCoordinatesTextBox.Text = RectangleToScreen(ClientRectangle).ToString();
-            
-            currentScreenTextBox.Text = Screen.FromControl(this).DeviceName;            
+
+            currentScreenTextBox.Text = Screen.FromControl(this).DeviceName;
         }
 
         /// <summary>
@@ -132,7 +135,7 @@ namespace ScreenInfo
         private void trackCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             tracking = trackCheckBox.Checked;
-            if (tracking) 
+            if (tracking)
                 UpdateTrackedInfo();
         }
 

@@ -19,20 +19,14 @@ namespace Hawkeye.ComponentModel
             minfo = info;
         }
 
-        protected MemberInfo MemberInfo
-        {
-            get { return minfo; }
-        }
+        protected MemberInfo MemberInfo => minfo;
 
         /// <summary>
         /// When overridden in a derived class, gets a value indicating whether this property is read-only.
         /// </summary>
         /// <returns>true if the property is read-only; otherwise, false.
         ///   </returns>
-        public override bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public override bool IsReadOnly => false;
 
         /// <summary>
         /// When overridden in a derived class, returns whether resetting an object changes its value.

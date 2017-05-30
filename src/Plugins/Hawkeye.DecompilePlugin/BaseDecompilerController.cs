@@ -6,7 +6,7 @@ namespace Hawkeye.DecompilePlugin
 {
     /// <summary>
     /// Allows an external program to remotely control a decompiler (Reflector or ILSpy).
-    /// This class is adapted from RemoteController.cs found in 
+    /// This class is adapted from RemoteController.cs found in
     /// .NET Reflector addins project (http://www.codeplex.com/reflectoraddins)
     /// </summary>
     /// <remarks>
@@ -17,7 +17,7 @@ namespace Hawkeye.DecompilePlugin
     {
         private IntPtr targetWindow = IntPtr.Zero;
 
-        public BaseDecompilerController()
+        protected BaseDecompilerController()
         {
             WindowMessage = WM_COPYDATA;
         }
@@ -84,13 +84,13 @@ namespace Hawkeye.DecompilePlugin
             get
             {
                 targetWindow = IntPtr.Zero;
-                EnumWindows(new EnumWindowsCallback(EnumWindow), 0);
+                EnumWindows(EnumWindow, 0);
                 return targetWindow;
             }
         }
 
         /// <summary>
-        /// Determines wether the specified window title matches the actual decompiler.
+        /// Determines whether the specified window title matches the actual decompiler.
         /// </summary>
         /// <param name="title">The window title.</param>
         /// <returns><c>true</c> if matches; otherwise, <c>false</c>.</returns>
@@ -108,10 +108,10 @@ namespace Hawkeye.DecompilePlugin
         {
             targetWindow = IntPtr.Zero;
 
-            // We can't use a simple FindWindow, because the decompiler window title 
-            // can vary: we must detect its window title starts with a known value; 
+            // We can't use a simple FindWindow, because the decompiler window title
+            // can vary: we must detect its window title starts with a known value
             // not simply it is equal to a known value. See the EnumWindow method.
-            EnumWindows(new EnumWindowsCallback(EnumWindow), 0);
+            EnumWindows(EnumWindow, 0);
 
             if (targetWindow != IntPtr.Zero)
             {
@@ -142,7 +142,8 @@ namespace Hawkeye.DecompilePlugin
                 targetWindow = handle;
                 return false; // No need to enumerate other windows
             }
-            else return true; // Try again
+
+            return true; // Try again
         }
     }
 }

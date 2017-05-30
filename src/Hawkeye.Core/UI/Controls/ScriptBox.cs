@@ -6,7 +6,6 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -14,13 +13,13 @@ namespace Hawkeye.UI.Controls
 {
 	public class ScriptBox : UserControl
 	{
-		private object _currentThreadLock = new object();
-		private RichTextBox txtScript;
-		private RichTextBox txtLog;
-		private SplitContainer splitContainer1;
+		private readonly object _currentThreadLock = new object();
+		private RichTextBox _txtScript;
+		private RichTextBox _txtLog;
+		private SplitContainer _splitContainer1;
 		private int _currentThreadId = -1;
-		private SplitContainer splitContainer2;
-		private RichTextBox txtCode;
+		private SplitContainer _splitContainer2;
+		private RichTextBox _txtCode;
 		private IControlInfo _controlInfo = null;
 
 		public ScriptBox() : base()
@@ -30,26 +29,12 @@ namespace Hawkeye.UI.Controls
 
 		private void txtScript_TextChanged(object sender, EventArgs e)
 		{
-			generateDelayed(GenerationMode.All);
+			GenerateDelayed(GenerationMode.All);
 		}
 
-		private void generateDelayed(GenerationMode mode)
+		private void GenerateDelayed(GenerationMode mode)
 		{
-			Action generateSync = () =>
-			{
-				Thread.Sleep(1000);
-
-				bool canRun = false;
-
-				lock (_currentThreadLock)
-					canRun = _currentThreadId == Thread.CurrentThread.ManagedThreadId;
-
-				if (canRun)
-				{
-					Action x = () => generate(mode);
-					this.Invoke(x);
-				}
-			};
+			Action generateSync = () => { GenerateSync(mode); };
 
 			var t = new Thread(() => generateSync());
 			lock (_currentThreadLock)
@@ -57,44 +42,45 @@ namespace Hawkeye.UI.Controls
 			t.Start();
 		}
 
-		private void generate(GenerationMode mode)
-		{
-			var logger = createLogger();
+	    private void GenerateSync(GenerationMode mode)
+	    {
+	        Thread.Sleep(1000);
 
-			string[] lines = txtScript.Lines;
+	        var canRun = false;
+
+	        lock (_currentThreadLock)
+	            canRun = _currentThreadId == Thread.CurrentThread.ManagedThreadId;
+
+	        if (!canRun) return;
+
+	        Action x = () => Generate(mode);
+	        Invoke(x);
+	    }
+
+	    private void Generate(GenerationMode mode)
+		{
+			var logger = CreateLogger();
+
+			var lines = _txtScript.Lines;
 
 			if (mode == GenerationMode.Selection)
-				lines = txtScript.SelectedText.Split(new string[] { "\n" }, StringSplitOptions.None);
+				lines = _txtScript.SelectedText.Split(new[] { "\n" }, StringSplitOptions.None);
 
 			SourceInfo info = ScriptGenerator.GetSource(lines);
 
-			txtCode.Text = info.SourceCode;
+			_txtCode.Text = info.SourceCode;
 
 			var res = CSharpScriptCompiler.Compile(info);
 
 			if (res.Errors.HasErrors)
 			{
-				var errors = new List<ScriptError>();
-
-				foreach (var item in res.Errors)
-				{
-					var compilerError = item as CompilerError;
-
-					if (compilerError != null)
-					{
-						var error = new ScriptError() { ErrorNumber = compilerError.ErrorNumber, Line = compilerError.Line, Message = compilerError.ErrorText };
-						ScriptErrorExtender.TryExtend(error);
-						errors.Add(error);
-					}
-				}
-
-				logger.ShowErrors(errors.ToArray());
+			    LogErrors(res, logger);
 			}
 			else
 			{
 				try
 				{
-					testCode(res.CompiledAssembly, logger);
+					TestCode(res.CompiledAssembly, logger);
 				}
 				catch (Exception ex)
 				{
@@ -103,22 +89,37 @@ namespace Hawkeye.UI.Controls
 			}
 		}
 
+	    private static void LogErrors(CompilerResults res, IScriptLogger logger)
+	    {
+	        var errors = new List<ScriptError>();
 
-		private IScriptLogger createLogger()
+	        foreach (var item in res.Errors)
+	        {
+	            var compilerError = item as CompilerError;
+
+	            if (compilerError != null)
+	            {
+	                var error = new ScriptError()
+	                {
+	                    ErrorNumber = compilerError.ErrorNumber,
+	                    Line = compilerError.Line,
+	                    Message = compilerError.ErrorText
+	                };
+	                ScriptErrorExtender.TryExtend(error);
+	                errors.Add(error);
+	            }
+	        }
+
+	        logger.ShowErrors(errors.ToArray());
+	    }
+
+
+	    private IScriptLogger CreateLogger()
 		{
-			return new TextBoxScriptLogger(txtLog);
+			return new TextBoxScriptLogger(_txtLog);
 		}
 
-		private void showErrors(List<CompilerError> list)
-		{
-			var sb = new StringBuilder();
-			foreach (var item in list)
-				sb.AppendLine(item.ErrorText);
-
-			MessageBox.Show(this, sb.ToString(), this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-		}
-
-		private void testCode(Assembly assembly, IScriptLogger logger)
+	    private void TestCode(Assembly assembly, IScriptLogger logger)
 		{
 			var scriptLoggerType = GetFirstLoggerHost(assembly.GetTypes());
 			if (scriptLoggerType != null)
@@ -129,14 +130,14 @@ namespace Hawkeye.UI.Controls
 		}
 
 		private Type GetFirstLoggerHost(Type[] assemblyTypes)
-		{ 
+		{
 			var loggerHostType = typeof(IScriptLoggerHost);
 
 			foreach (var type in assemblyTypes)
 			{
 				 foreach (var face in type.GetInterfaces())
 				 {
-					 if (face.Equals(loggerHostType))
+					 if (face == loggerHostType)
 						 return type;
 				 }
 			}
@@ -170,13 +171,13 @@ namespace Hawkeye.UI.Controls
 				lines[1] = "";
 			}
 
-			txtScript.Lines = lines;
-			txtScript.SelectionStart = txtScript.Text.Length;
-			txtScript.SelectionLength = 0;
-			generate(GenerationMode.All);
+			_txtScript.Lines = lines;
+			_txtScript.SelectionStart = _txtScript.Text.Length;
+			_txtScript.SelectionLength = 0;
+			Generate(GenerationMode.All);
 		}
 
-		public IControlInfo ControlInfo
+        public IControlInfo ControlInfo
 		{
 			get { return _controlInfo; }
 			set { updateControlInfo(value); }
@@ -184,101 +185,101 @@ namespace Hawkeye.UI.Controls
 
 		private void InitializeComponent()
 		{
-			this.txtScript = new System.Windows.Forms.RichTextBox();
-			this.txtLog = new System.Windows.Forms.RichTextBox();
-			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-			this.txtCode = new System.Windows.Forms.RichTextBox();
-			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-			this.splitContainer1.Panel1.SuspendLayout();
-			this.splitContainer1.Panel2.SuspendLayout();
-			this.splitContainer1.SuspendLayout();
-			this.splitContainer2.Panel1.SuspendLayout();
-			this.splitContainer2.Panel2.SuspendLayout();
-			this.splitContainer2.SuspendLayout();
-			this.SuspendLayout();
-			// 
+			_txtScript = new RichTextBox();
+			_txtLog = new RichTextBox();
+			_splitContainer1 = new SplitContainer();
+			_txtCode = new RichTextBox();
+			_splitContainer2 = new SplitContainer();
+			_splitContainer1.Panel1.SuspendLayout();
+			_splitContainer1.Panel2.SuspendLayout();
+			_splitContainer1.SuspendLayout();
+			_splitContainer2.Panel1.SuspendLayout();
+			_splitContainer2.Panel2.SuspendLayout();
+			_splitContainer2.SuspendLayout();
+			SuspendLayout();
+			//
 			// txtScript
-			// 
-			this.txtScript.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.txtScript.Font = new System.Drawing.Font("Consolas", 8.25F);
-			this.txtScript.Location = new System.Drawing.Point(0, 0);
-			this.txtScript.Name = "txtScript";
-			this.txtScript.Size = new System.Drawing.Size(589, 165);
-			this.txtScript.TabIndex = 0;
-			this.txtScript.Text = "";
-			this.txtScript.TextChanged += new System.EventHandler(this.txtScript_TextChanged);
-			// 
+			//
+			_txtScript.Dock = DockStyle.Fill;
+			_txtScript.Font = new System.Drawing.Font("Consolas", 8.25F);
+			_txtScript.Location = new System.Drawing.Point(0, 0);
+			_txtScript.Name = "_txtScript";
+			_txtScript.Size = new System.Drawing.Size(589, 165);
+			_txtScript.TabIndex = 0;
+			_txtScript.Text = "";
+			_txtScript.TextChanged += new EventHandler(txtScript_TextChanged);
+			//
 			// txtLog
-			// 
-			this.txtLog.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.txtLog.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.txtLog.Location = new System.Drawing.Point(0, 0);
-			this.txtLog.Name = "txtLog";
-			this.txtLog.ReadOnly = true;
-			this.txtLog.Size = new System.Drawing.Size(585, 180);
-			this.txtLog.TabIndex = 1;
-			this.txtLog.Text = "";
-			// 
+			//
+			_txtLog.Dock = DockStyle.Fill;
+			_txtLog.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			_txtLog.Location = new System.Drawing.Point(0, 0);
+			_txtLog.Name = "_txtLog";
+			_txtLog.ReadOnly = true;
+			_txtLog.Size = new System.Drawing.Size(585, 180);
+			_txtLog.TabIndex = 1;
+			_txtLog.Text = "";
+			//
 			// splitContainer1
-			// 
-			this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-			this.splitContainer1.Name = "splitContainer1";
-			this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-			// 
+			//
+			_splitContainer1.Dock = DockStyle.Fill;
+			_splitContainer1.Location = new System.Drawing.Point(0, 0);
+			_splitContainer1.Name = "_splitContainer1";
+			_splitContainer1.Orientation = Orientation.Horizontal;
+			//
 			// splitContainer1.Panel1
-			// 
-			this.splitContainer1.Panel1.Controls.Add(this.txtScript);
-			// 
+			//
+			_splitContainer1.Panel1.Controls.Add(_txtScript);
+			//
 			// splitContainer1.Panel2
-			// 
-			this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-			this.splitContainer1.Size = new System.Drawing.Size(589, 349);
-			this.splitContainer1.SplitterDistance = 165;
-			this.splitContainer1.TabIndex = 2;
-			// 
+			//
+			_splitContainer1.Panel2.Controls.Add(_splitContainer2);
+			_splitContainer1.Size = new System.Drawing.Size(589, 349);
+			_splitContainer1.SplitterDistance = 165;
+			_splitContainer1.TabIndex = 2;
+			//
 			// txtCode
-			// 
-			this.txtCode.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.txtCode.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.txtCode.Location = new System.Drawing.Point(0, 0);
-			this.txtCode.Name = "txtCode";
-			this.txtCode.ReadOnly = true;
-			this.txtCode.Size = new System.Drawing.Size(0, 180);
-			this.txtCode.TabIndex = 2;
-			this.txtCode.Text = "";
-			// 
+			//
+			_txtCode.Dock = DockStyle.Fill;
+			_txtCode.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			_txtCode.Location = new System.Drawing.Point(0, 0);
+			_txtCode.Name = "_txtCode";
+			_txtCode.ReadOnly = true;
+			_txtCode.Size = new System.Drawing.Size(0, 180);
+			_txtCode.TabIndex = 2;
+			_txtCode.Text = "";
+			//
 			// splitContainer2
-			// 
-			this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-			this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-			this.splitContainer2.Name = "splitContainer2";
-			// 
+			//
+			_splitContainer2.Dock = DockStyle.Fill;
+			_splitContainer2.FixedPanel = FixedPanel.Panel2;
+			_splitContainer2.Location = new System.Drawing.Point(0, 0);
+			_splitContainer2.Name = "_splitContainer2";
+			//
 			// splitContainer2.Panel1
-			// 
-			this.splitContainer2.Panel1.Controls.Add(this.txtLog);
-			// 
+			//
+			_splitContainer2.Panel1.Controls.Add(_txtLog);
+			//
 			// splitContainer2.Panel2
-			// 
-			this.splitContainer2.Panel2.Controls.Add(this.txtCode);
-			this.splitContainer2.Panel2MinSize = 0;
-			this.splitContainer2.Size = new System.Drawing.Size(589, 180);
-			this.splitContainer2.SplitterDistance = 585;
-			this.splitContainer2.TabIndex = 3;
-			// 
+			//
+			_splitContainer2.Panel2.Controls.Add(_txtCode);
+			_splitContainer2.Panel2MinSize = 0;
+			_splitContainer2.Size = new System.Drawing.Size(589, 180);
+			_splitContainer2.SplitterDistance = 585;
+			_splitContainer2.TabIndex = 3;
+			//
 			// ScriptBox
-			// 
-			this.Controls.Add(this.splitContainer1);
-			this.Name = "ScriptBox";
-			this.Size = new System.Drawing.Size(589, 349);
-			this.splitContainer1.Panel1.ResumeLayout(false);
-			this.splitContainer1.Panel2.ResumeLayout(false);
-			this.splitContainer1.ResumeLayout(false);
-			this.splitContainer2.Panel1.ResumeLayout(false);
-			this.splitContainer2.Panel2.ResumeLayout(false);
-			this.splitContainer2.ResumeLayout(false);
-			this.ResumeLayout(false);
+			//
+			Controls.Add(_splitContainer1);
+			Name = "ScriptBox";
+			Size = new System.Drawing.Size(589, 349);
+			_splitContainer1.Panel1.ResumeLayout(false);
+			_splitContainer1.Panel2.ResumeLayout(false);
+			_splitContainer1.ResumeLayout(false);
+			_splitContainer2.Panel1.ResumeLayout(false);
+			_splitContainer2.Panel2.ResumeLayout(false);
+			_splitContainer2.ResumeLayout(false);
+			ResumeLayout(false);
 
 		}
 	}

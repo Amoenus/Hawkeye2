@@ -87,10 +87,7 @@ namespace Hawkeye.Configuration
             LoadLayouts();
         }
 
-        private bool EventsLocked
-        {
-            get { return eventsAreSuspended; }
-        }
+        private bool EventsLocked => eventsAreSuspended;
 
         /// <summary>
         /// Suspends the forms events from being observed by this service.

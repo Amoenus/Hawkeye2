@@ -85,25 +85,13 @@ namespace Hawkeye.WinApi
             Bottom = bottom;
         }
 
-        public int Height
-        {
-            get { return Bottom - Top; }
-        }
+        public int Height => Bottom - Top;
 
-        public int Width
-        {
-            get { return Right - Left; }
-        }
+        public int Width => Right - Left;
 
-        public Size Size
-        {
-            get { return new Size(Width, Height); }
-        }
+        public Size Size => new Size(Width, Height);
 
-        public Point Location
-        {
-            get { return new Point(Left, Top); }
-        }
+        public Point Location => new Point(Left, Top);
 
         public Rectangle ToRectangle()
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using Hawkeye.Logging;
 
 namespace Hawkeye
 {
@@ -34,18 +33,12 @@ namespace Hawkeye
         /// <summary>
         /// Gets Hawkeye current CLR.
         /// </summary>
-        public static Clr CurrentClr
-        {
-            get { return currentClr; }
-        }
+        public static Clr CurrentClr => currentClr;
 
         /// <summary>
         /// Gets Hawkeye current bitness.
         /// </summary>
-        public static Bitness CurrentBitness
-        {
-            get { return currentBitness; }
-        }
+        public static Bitness CurrentBitness => currentBitness;
 
         /// <summary>
         /// Runs the Hawkeye application.

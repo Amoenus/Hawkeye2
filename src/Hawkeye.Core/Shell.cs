@@ -55,14 +55,8 @@ namespace Hawkeye
 
         public IHawkeyeApplicationInfo ApplicationInfo { get; private set; }
 
-        public IWindowInfo CurrentWindowInfo
-        {
-            get
-            {
-                return mainControl == null ?
-                    null : mainControl.CurrentInfo;
-            }
-        }
+        public IWindowInfo CurrentWindowInfo => mainControl == null ?
+            null : mainControl.CurrentInfo;
 
         #endregion
 
@@ -150,7 +144,7 @@ namespace Hawkeye
         /// <param name="info">The info.</param>
         public void Inject(IWindowInfo info)
         {
-            if (info == null) throw new ArgumentNullException("info");
+            if (info == null) throw new ArgumentNullException(nameof(info));
 
             var handle = info.Handle;
             var bootstrapExecutable = GetBootstrap(info.Clr, info.Bitness);
@@ -271,7 +265,7 @@ namespace Hawkeye
             {
                 case Bitness.x86: bitnessVersion = "x86"; break;
                 case Bitness.x64: bitnessVersion = "x64"; break;
-                default: throw new ArgumentException($"Bitness Value {bitness} is invalid.", "bitness");
+                default: throw new ArgumentException($"Bitness Value {bitness} is invalid.", nameof(bitness));
             }
 
             var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

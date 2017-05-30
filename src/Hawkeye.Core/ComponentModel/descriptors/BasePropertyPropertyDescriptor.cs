@@ -15,9 +15,6 @@ namespace Hawkeye.ComponentModel
             pinfo = propertyInfo;
         }
 
-        protected PropertyInfo PropertyInfo
-        {
-            get { return pinfo; }
-        }
+        protected PropertyInfo PropertyInfo => pinfo;
     }
 }

@@ -3,7 +3,6 @@ using System.Windows.Forms;
 using System.ComponentModel;
 
 using Hawkeye.Logging;
-using Hawkeye.UI;
 
 namespace Hawkeye.ComponentModel
 {
@@ -63,10 +62,7 @@ namespace Hawkeye.ComponentModel
         
         #region IProxy Members
 
-        public object Value
-        {
-            get { return Control; }
-        }
+        public object Value => Control;
 
         #endregion
 

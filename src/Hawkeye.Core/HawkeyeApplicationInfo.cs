@@ -22,10 +22,7 @@ namespace Hawkeye
         /// <summary>
         /// Gets the application data directory.
         /// </summary>
-        public string ApplicationDataDirectory
-        {
-            get { return hawkeyeDataDirectory; }
-        }
+        public string ApplicationDataDirectory => hawkeyeDataDirectory;
 
         #endregion
     }

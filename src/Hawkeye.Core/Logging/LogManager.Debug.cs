@@ -58,10 +58,7 @@ namespace Hawkeye.Logging
             /// Gets the type this logger is attached to.
             /// </summary>
             /// <value>The type this logger is attached to.</value>
-            protected override Type SourceType
-            {
-                get { return sourceType ?? thisServiceType; }
-            }
+            protected override Type SourceType => sourceType ?? thisServiceType;
         }
     }
 }

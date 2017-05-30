@@ -14,7 +14,7 @@ namespace Hawkeye.Logging.log4net
         /// <param name="log4netLayout">The log4net layout.</param>
         public Log4NetLayoutFormatter(global::log4net.Layout.ILayout log4netLayout)
         {
-            if (log4netLayout == null) throw new ArgumentNullException("log4netLayout");
+            if (log4netLayout == null) throw new ArgumentNullException(nameof(log4netLayout));
             layout = log4netLayout;
         }
 

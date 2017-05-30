@@ -56,11 +56,8 @@ namespace Hawkeye.Reflection
             } while (info == null);
         }
 
-        public bool IsValid
-        {
-            get { return info != null; }
-        }
-        
+        public bool IsValid => info != null;
+
         public object Invoke(object target, object[] param)
         {
             return info.Invoke(target, param);

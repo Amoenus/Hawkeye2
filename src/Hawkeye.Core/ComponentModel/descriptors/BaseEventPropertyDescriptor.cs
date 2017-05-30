@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.ComponentModel;
 
 namespace Hawkeye.ComponentModel
 {
@@ -16,29 +15,17 @@ namespace Hawkeye.ComponentModel
             einfo = eventInfo;
         }
 
-        protected EventInfo EventInfo
-        {
-            get { return einfo; }
-        }
+        protected EventInfo EventInfo => einfo;
 
-        public override Type ComponentType
-        {
-            get { return type; }
-        }
+        public override Type ComponentType => type;
 
         public override object GetValue(object component)
         {
             return null;
         }
 
-        public override bool IsReadOnly
-        {
-            get { return true; }
-        }
+        public override bool IsReadOnly => true;
 
-        public override Type PropertyType
-        {
-            get { return einfo.EventHandlerType; }
-        }
+        public override Type PropertyType => einfo.EventHandlerType;
     }
 }

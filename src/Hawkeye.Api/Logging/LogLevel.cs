@@ -1,5 +1,3 @@
-using System;
-
 namespace Hawkeye.Logging
 {
     /// <summary>Trace levels</summary>

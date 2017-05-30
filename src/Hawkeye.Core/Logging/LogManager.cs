@@ -27,10 +27,7 @@ namespace Hawkeye.Logging
         /// <value>
         /// 	<c>true</c> if this <c>LogManager</c> is text box attachable; otherwise, <c>false</c>.
         /// </value>
-        public static bool CanAppendLogService
-        {
-            get { return factory is ILogServiceAppendable; }
-        }
+        public static bool CanAppendLogService => factory is ILogServiceAppendable;
 
         /// <summary>
         /// Gets the default logger.
@@ -79,7 +76,7 @@ namespace Hawkeye.Logging
         {
             if (!CanAppendLogService) throw new NotSupportedException(
                 "This function is only supported when using a logging framework providing an implementation of 'ILogServiceAppendable'.");
-            if (toAppend == null) throw new ArgumentNullException("toAppend");
+            if (toAppend == null) throw new ArgumentNullException(nameof(toAppend));
 
             return ((ILogServiceAppendable)factory).AppendLogService(toAppend, additionalData);
         }

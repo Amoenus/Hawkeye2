@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Hawkeye.Extensibility;
+﻿using Hawkeye.Extensibility;
 using Hawkeye.Logging;
 using System.Windows.Forms;
+using Hawkeye.DecompilePlugin.Reflector;
 
 namespace Hawkeye.DecompilePlugin
 {
@@ -20,24 +18,14 @@ namespace Hawkeye.DecompilePlugin
         public BaseDecompilerPluginCore(IPluginDescriptor descriptor) : 
             base(descriptor) { }
 
-        public override string Label
-        {
-            get { return "&Decompile"; }
-        }
+        public override string Label => "&Decompile";
 
         protected abstract IDecompilerController CreateDecompilerController();
 
-        protected virtual string DecompilerNotAvailable
-        {
-            get 
-            { 
-                return
-@"A running instance of the decompiler could not be found. 
+        protected virtual string DecompilerNotAvailable => @"A running instance of the decompiler could not be found. 
 Hawkeye can not show you the source code for the selected item.
 
-Make sure it is running"; 
-            }
-        }
+Make sure it is running";
 
         /// <summary>
         /// Called when the plugin has just been initialized.

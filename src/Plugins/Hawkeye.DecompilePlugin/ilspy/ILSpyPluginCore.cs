@@ -1,7 +1,6 @@
 ﻿using System.Drawing;
-using Hawkeye.Extensibility;
 
-namespace Hawkeye.DecompilePlugin
+namespace Hawkeye.DecompilePlugin.IlSpy
 {
     internal class ILSpyPluginCore : BaseDecompilerPluginCore
     {
@@ -9,36 +8,23 @@ namespace Hawkeye.DecompilePlugin
         /// Initializes a new instance of the <see cref="ILSpyPluginCore"/> class.
         /// </summary>
         /// <param name="descriptor">The descriptor.</param>
-        public ILSpyPluginCore(ILSpyPluginDescriptor descriptor) : 
+        public ILSpyPluginCore(IlSpyPluginDescriptor descriptor) :
             base(descriptor) { }
 
         /// <summary>
         /// Gets the label displayed on the menu (or toolbar button) for this command.
         /// </summary>
-        public override string Label
-        {
-            get { return "Decompile with &ILSpy"; }
-        }
+        public override string Label => "Decompile with &ILSpy";
 
         /// <summary>
         /// Gets the image displayed on the menu (or toolbar button) for this command.
         /// </summary>
-        public override Bitmap Image
-        {
-            get { return Properties.Resources.ILSpy; }
-        }
+        public override Bitmap Image => Properties.Resources.ILSpy;
 
-        protected override string DecompilerNotAvailable
-        {
-            get
-            {
-                return
-@"ILSpy is not started. 
+        protected override string DecompilerNotAvailable => @"ILSpy is not started. 
 Hawkeye can not show you the source code for the selected item.
 
 Please open ILSpy to use this feature.";
-            }
-        }
 
         protected override IDecompilerController CreateDecompilerController()
         {

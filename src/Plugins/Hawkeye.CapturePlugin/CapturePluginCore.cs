@@ -11,31 +11,25 @@ namespace Hawkeye.CapturePlugin
 {
     internal class CapturePluginCore : BaseCommandPlugin
     {
-        private ILogService log = null;
-        private IWindowInfo windowInfo = null;
+        private ILogService _log = null;
+        private IWindowInfo _windowInfo = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CapturePluginCore"/> class.
         /// </summary>
         /// <param name="descriptor">The descriptor.</param>
-        public CapturePluginCore(CapturePluginDescriptor descriptor) : 
+        public CapturePluginCore(IPluginDescriptor descriptor) :
             base(descriptor) { }
 
         /// <summary>
         /// Gets the label displayed on the menu (or toolbar button) for this command.
         /// </summary>
-        public override string Label
-        {
-            get { return "&Capture"; }
-        }
+        public override string Label => "&Capture";
 
         /// <summary>
         /// Gets the image displayed on the menu (or toolbar button) for this command.
         /// </summary>
-        public override Bitmap Image
-        {
-            get { return Properties.Resources.Camera; }
-        }
+        public override Bitmap Image => Properties.Resources.Camera;
 
         /// <summary>
         /// Called when the plugin has just been initialized.
@@ -44,17 +38,23 @@ namespace Hawkeye.CapturePlugin
         {
             base.OnInitialized();
 
-            log = base.Host.GetLogger<CapturePluginCore>();
-            base.Host.CurrentWindowInfoChanged += (s, e) =>
-            {
-                windowInfo = base.Host.CurrentWindowInfo;
-                base.RaiseCanExecuteChanged(this);                
-            };
+            _log = Host.GetLogger<CapturePluginCore>();
+            SubscribeEvent();
 
-            windowInfo = base.Host.CurrentWindowInfo;
-            base.RaiseCanExecuteChanged(this);
+            OnHostOnCurrentWindowInfoChanged(null, null);
 
-            log.Info($"'{base.Descriptor.Name}' was initialized.");
+            _log.Info($"'{Descriptor.Name}' was initialized.");
+        }
+
+        private void SubscribeEvent()
+        {
+            Host.CurrentWindowInfoChanged += OnHostOnCurrentWindowInfoChanged;
+        }
+
+        private void OnHostOnCurrentWindowInfoChanged(object s, EventArgs e)
+        {
+            _windowInfo = Host.CurrentWindowInfo;
+            RaiseCanExecuteChanged(this);
         }
 
         /// <summary>
@@ -66,9 +66,7 @@ namespace Hawkeye.CapturePlugin
         protected override bool CanExecuteCore()
         {
             return
-                windowInfo != null &&
-                windowInfo.ControlInfo != null &&
-                windowInfo.ControlInfo.Control != null;
+                _windowInfo?.ControlInfo?.Control != null;
         }
 
         /// <summary>
@@ -76,20 +74,19 @@ namespace Hawkeye.CapturePlugin
         /// </summary>
         protected override void ExecuteCore()
         {
-            log.Debug("Executing capture command");
-            var control = windowInfo.ControlInfo.Control;
+            _log.Debug("Executing capture command");
+            var control = _windowInfo.ControlInfo.Control;
             using (var image = new Bitmap(control.Width, control.Height, PixelFormat.Format32bppArgb))
             {
                 using (var g = Graphics.FromImage(image))
                 {
                     g.Clear(Color.Transparent);
-                    //g.FillRectangle(Brushes.Red, control.Width / 4, control.Height / 4, control.Width / 2, control.Height / 2);
                 }
-                
+
                 control.DrawToBitmap(image, new Rectangle(0, 0, control.Width, control.Height));
 
                 var dataObject = new DataObject();
-                
+
                 // First png to retain transparency (though Paint.Net does not seem to use paste this if a bitmap is present in the clipboard...
                 var stream = new MemoryStream(); // Note: the stream is not closed, nor disposed; otherwise, the image can't be pasted
                 image.Save(stream, ImageFormat.Png);

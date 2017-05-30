@@ -1,8 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 
-using Hawkeye.UI;
-
 namespace Hawkeye.ComponentModel
 {
     internal class GenericTypeDescriptor : ICustomTypeDescriptor
@@ -12,8 +10,8 @@ namespace Hawkeye.ComponentModel
 
         public GenericTypeDescriptor(Type objectType, ICustomTypeDescriptor parent)
         {
-            if (objectType == null) throw new ArgumentNullException("objectType");
-            if (parent == null) throw new ArgumentNullException("parent");
+            if (objectType == null) throw new ArgumentNullException(nameof(objectType));
+            if (parent == null) throw new ArgumentNullException(nameof(parent));
             type = objectType;
             parentDescriptor = parent;
         }

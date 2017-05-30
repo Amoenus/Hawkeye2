@@ -20,7 +20,7 @@ namespace Hawkeye
         /// <exception cref="System.ArgumentNullException">value</exception>
         public static bool IsA(this object value, Type type)
         {
-            if (value == null) throw new ArgumentNullException("value");
+            if (value == null) throw new ArgumentNullException(nameof(value));
             return value.GetType().IsA(type);
         }
 

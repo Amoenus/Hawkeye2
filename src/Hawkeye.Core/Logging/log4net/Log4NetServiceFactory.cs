@@ -54,7 +54,7 @@ namespace Hawkeye.Logging.log4net
         /// </returns>
         public ILogLevelThresholdSelector AppendLogService(ILogService logService, IDictionary<string, object> additionalData = null)
         {
-            if (logService == null) throw new ArgumentNullException("logService");
+            if (logService == null) throw new ArgumentNullException(nameof(logService));
 
             if (RootLog4NetService == null) return null;
             return RootLog4NetService.AppendLogService(logService, additionalData);

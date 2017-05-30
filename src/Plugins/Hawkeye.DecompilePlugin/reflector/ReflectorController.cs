@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Hawkeye.DecompilePlugin
+namespace Hawkeye.DecompilePlugin.Reflector
 {
     internal class ReflectorController : BaseDecompilerController
     {
         #region API
-        
+
         /// <summary>
         /// Gets a value indicating whether a decompiler instance is running.
         /// </summary>
@@ -13,10 +13,7 @@ namespace Hawkeye.DecompilePlugin
         /// <c>true</c> if a running decompiler instance could be found; otherwise, <c>false</c>.
         /// </value>
         /// <exception cref="System.NotImplementedException"></exception>
-        public override bool IsRunning
-        {
-            get { return base.Send("Available\n4.0.0.0"); }
-        }
+        public override bool IsRunning => base.Send("Available\n4.0.0.0");
 
         /// <summary>
         /// Loads the type's assembly then selects the specified type declaration in the decompiler;

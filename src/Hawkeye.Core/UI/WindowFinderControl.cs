@@ -29,10 +29,7 @@ namespace Hawkeye.UI
         public event EventHandler ActiveWindowChanged;
         public event EventHandler WindowSelected;
 
-        public IntPtr ActiveWindowHandle
-        {
-            get { return windowHandle; }
-        }
+        public IntPtr ActiveWindowHandle => windowHandle;
 
         protected override void OnLoad(EventArgs e)
         {

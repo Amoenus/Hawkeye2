@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 
 namespace Hawkeye.DecompilePlugin
 {
@@ -66,10 +65,7 @@ namespace Hawkeye.DecompilePlugin
         /// <value>
         /// <c>true</c> if a running decompiler instance could be found; otherwise, <c>false</c>.
         /// </value>
-        public override bool IsRunning
-        {
-            get { return TargetWindow != IntPtr.Zero; }
-        }
+        public override bool IsRunning => TargetWindow != IntPtr.Zero;
 
         protected override bool DoesWindowTitleMatches(string title)
         {

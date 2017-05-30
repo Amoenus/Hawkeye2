@@ -25,10 +25,7 @@ namespace Hawkeye.Configuration
             }
         }
 
-        public static string SettingsFileName
-        {
-            get { return settingsFileName; }
-        }
+        public static string SettingsFileName => settingsFileName;
 
         /// <summary>
         /// Initializes the Settings manager with the specified filename.

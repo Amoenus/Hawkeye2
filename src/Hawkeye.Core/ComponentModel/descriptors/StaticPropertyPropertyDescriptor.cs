@@ -27,10 +27,7 @@ namespace Hawkeye.ComponentModel
 
         public override bool CanResetValue(object component) { return false; } //TODO: why should this be false?
 
-        public override Type ComponentType
-        {
-            get { return type; }
-        }
+        public override Type ComponentType => type;
 
         public override object GetValue(object component)
         {
@@ -38,15 +35,9 @@ namespace Hawkeye.ComponentModel
             return base.PropertyInfo.Get(null, ref criticalGetError);
         }
 
-        public override bool IsReadOnly
-        {
-            get { return !base.PropertyInfo.CanWrite; }
-        }
+        public override bool IsReadOnly => !base.PropertyInfo.CanWrite;
 
-        public override Type PropertyType
-        {
-            get { return base.PropertyInfo.PropertyType; }
-        }
+        public override Type PropertyType => base.PropertyInfo.PropertyType;
 
         public override void ResetValue(object component) { }
 

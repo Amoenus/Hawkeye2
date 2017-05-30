@@ -1,7 +1,7 @@
 ﻿using System;
 using Hawkeye.Extensibility;
 
-namespace Hawkeye.DecompilePlugin
+namespace Hawkeye.DecompilePlugin.Reflector
 {
     internal class ReflectorPluginDescriptor : IPluginDescriptor
     {
@@ -12,18 +12,12 @@ namespace Hawkeye.DecompilePlugin
         /// <summary>
         /// Gets this plugin name.
         /// </summary>
-        public string Name
-        {
-            get { return "Reflector Plugin"; }
-        }
+        public string Name => "Reflector Plugin";
 
         /// <summary>
         /// Gets this plugin version.
         /// </summary>
-        public Version Version
-        {
-            get { return version; }
-        }
+        public Version Version => version;
 
         /// <summary>
         /// Creates an instance of the plugin passing it the specified host.

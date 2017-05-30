@@ -22,10 +22,7 @@ namespace Hawkeye.UI.PropertyTabs
         ///   <PermissionSet>
         ///   <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true" />
         ///   </PermissionSet>
-        public override Bitmap Bitmap
-        {
-            get { return Properties.Resources.AllProperties; }
-        }
+        public override Bitmap Bitmap => Properties.Resources.AllProperties;
 
         /// <summary>
         /// Gets the name for the property tab.
@@ -33,10 +30,7 @@ namespace Hawkeye.UI.PropertyTabs
         /// <returns>
         /// The name for the property tab.
         ///   </returns>
-        public override string TabName
-        {
-            get { return "3. All Properties"; }
-        }
+        public override string TabName => "3. All Properties";
 
         /// <summary>
         /// Gets all the properties of the specified component that match the specified attributes and context.

@@ -30,10 +30,7 @@ namespace Hawkeye.Extensibility
         /// <summary>
         /// Gets the image displayed on the menu (or toolbar button) for this command.
         /// </summary>
-        public virtual Bitmap Image
-        {
-            get { return null; }
-        }
+        public virtual Bitmap Image => null;
 
         /// <summary>
         /// Executes this command.

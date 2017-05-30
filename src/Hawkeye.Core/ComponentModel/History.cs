@@ -21,20 +21,11 @@ namespace Hawkeye.ComponentModel
             }
         }
 
-        public int Count
-        {
-            get { return list.Count; }
-        }
+        public int Count => list.Count;
 
-        public bool HasPrevious
-        {
-            get { return index > 0; }
-        }
+        public bool HasPrevious => index > 0;
 
-        public bool HasNext
-        {
-            get { return index < list.Count - 1; }
-        }
+        public bool HasNext => index < list.Count - 1;
 
         public void Reset()
         {

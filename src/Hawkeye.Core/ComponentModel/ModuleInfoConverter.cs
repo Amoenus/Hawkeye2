@@ -28,10 +28,7 @@ namespace Hawkeye.ComponentModel
             /// <summary>
             /// Always read-only!
             /// </summary>
-            public override bool IsReadOnly
-            {
-                get { return true; }
-            }
+            public override bool IsReadOnly => true;
 
             /// <summary>
             /// When overridden in a derived class, gets the current value of the property on a component.

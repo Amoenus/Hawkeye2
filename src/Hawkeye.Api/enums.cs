@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Hawkeye
+﻿namespace Hawkeye
 {
     /// <summary>
     /// Enumerates the clr versions supported by Hawkeye
@@ -25,6 +23,7 @@ namespace Hawkeye
     public enum Bitness
     {
         /// <summary>x86 means 32bits</summary>
+        // ReSharper disable InconsistentNaming as this is the preferred spelling
         x86,
         /// <summary>x64 means 64bits.</summary>
         x64

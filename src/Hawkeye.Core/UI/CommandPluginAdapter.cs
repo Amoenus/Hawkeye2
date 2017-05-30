@@ -13,7 +13,7 @@ namespace Hawkeye.UI
 
         public CommandPluginAdapter(ICommandPlugin commandPlugin)
         {
-            if (commandPlugin == null) throw new ArgumentNullException("commandPlugin");
+            if (commandPlugin == null) throw new ArgumentNullException(nameof(commandPlugin));
             plugin = commandPlugin;
 
             CreateControls();

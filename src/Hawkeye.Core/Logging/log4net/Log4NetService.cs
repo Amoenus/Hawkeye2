@@ -20,10 +20,7 @@ namespace Hawkeye.Logging.log4net
         /// Gets the current log object.
         /// </summary>
         /// <value>The current log object.</value>
-        private global::log4net.Core.ILogger CurrentLogger
-        {
-            get { return currentLogger ?? global::log4net.LogManager.GetLogger(SourceType).Logger; }
-        }
+        private global::log4net.Core.ILogger CurrentLogger => currentLogger ?? global::log4net.LogManager.GetLogger(SourceType).Logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Log4NetService"/> class.
@@ -54,7 +51,7 @@ namespace Hawkeye.Logging.log4net
         /// <param name="entry">The entry to log.</param>
         public override void Log(ILogEntry entry)
         {
-            if (entry == null) throw new ArgumentNullException("entry");
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
 
             CurrentLogger.Log(SourceType,
                 Log4NetHelper.LogLevelToLog4NetLevel(entry.Level),
@@ -94,9 +91,6 @@ namespace Hawkeye.Logging.log4net
         /// Gets the type this logger is attached to.
         /// </summary>
         /// <value>The type this logger is attached to.</value>
-        protected override Type SourceType
-        {
-            get { return sourceType ?? thisServiceType; }
-        }
+        protected override Type SourceType => sourceType ?? thisServiceType;
     }
 }

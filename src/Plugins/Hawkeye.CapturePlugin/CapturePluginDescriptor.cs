@@ -12,18 +12,12 @@ namespace Hawkeye.CapturePlugin
         /// <summary>
         /// Gets this plugin name.
         /// </summary>
-        public string Name
-        {
-            get { return "Capture Plugin"; }
-        }
+        public string Name => "Capture Plugin";
 
         /// <summary>
         /// Gets this plugin version.
         /// </summary>
-        public Version Version
-        {
-            get { return version; }
-        }
+        public Version Version => version;
 
         /// <summary>
         /// Creates an instance of the plugin passing it the specified host.

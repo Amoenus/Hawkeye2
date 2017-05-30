@@ -20,7 +20,7 @@ namespace Hawkeye.ComponentModel
             public GenericTypeDescriptionProvider(ICustomTypeDescriptor customTypeDescriptor)
                 : base() 
             {
-                if (customTypeDescriptor == null) throw new ArgumentNullException("customTypeDescriptor");
+                if (customTypeDescriptor == null) throw new ArgumentNullException(nameof(customTypeDescriptor));
                 typeDescriptor = customTypeDescriptor;
             }
 
@@ -66,7 +66,7 @@ namespace Hawkeye.ComponentModel
 
         public static void AddGenericProviderToType(Type type)
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if (type == null) throw new ArgumentNullException(nameof(type));
             if (providers.ContainsKey(type))
                 return;
 

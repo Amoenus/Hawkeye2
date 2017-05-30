@@ -87,16 +87,10 @@ namespace Hawkeye.Reflection
             } while (info == null);
         }
 
-        public object Target
-        {
-            get { return target; }
-        }
+        public object Target => target;
 
-        public bool IsValid
-        {
-            get { return info != null; }
-        }
-        
+        public bool IsValid => info != null;
+
         public object Get(object operationTarget = null)
         {
             return info.GetValue(operationTarget ?? target, null);

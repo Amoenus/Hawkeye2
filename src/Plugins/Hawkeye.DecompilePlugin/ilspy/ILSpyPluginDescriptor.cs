@@ -1,23 +1,18 @@
 ﻿using System;
+using Hawkeye.DecompilePlugin.ilspy;
 using Hawkeye.Extensibility;
 
-namespace Hawkeye.DecompilePlugin
+namespace Hawkeye.DecompilePlugin.IlSpy
 {
-    internal class ILSpyPluginDescriptor : IPluginDescriptor
+    internal class IlSpyPluginDescriptor : IPluginDescriptor
     {
         private static readonly Version version = new Version(AssemblyVersionInfo.Version);
 
         #region IPluginDescriptor Members
 
-        public string Name
-        {
-            get { return "ILSpy Plugin"; }
-        }
+        public string Name => "ILSpy Plugin";
 
-        public Version Version
-        {
-            get { return version; }
-        }
+        public Version Version => version;
 
         public IPlugin Create(IHawkeyeHost host)
         {

@@ -17,10 +17,7 @@ namespace Hawkeye.UI.PropertyTabs
         ///   <PermissionSet>
         ///   <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true" />
         ///   </PermissionSet>
-        public override Bitmap Bitmap
-        {
-            get { return Properties.Resources.Events; }
-        }
+        public override Bitmap Bitmap => Properties.Resources.Events;
 
         /// <summary>
         /// Gets the name for the property tab.
@@ -28,10 +25,7 @@ namespace Hawkeye.UI.PropertyTabs
         /// <returns>
         /// The name for the property tab.
         ///   </returns>
-        public override string TabName
-        {
-            get { return "2. Events"; }
-        }
+        public override string TabName => "2. Events";
 
         /// <summary>
         /// Gets all the properties of the specified component that match the specified attributes and context.

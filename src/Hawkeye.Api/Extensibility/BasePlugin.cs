@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Hawkeye.Extensibility
 {
@@ -9,19 +7,16 @@ namespace Hawkeye.Extensibility
     /// </summary>
     public abstract class BasePlugin : IPlugin
     {
-        private readonly IPluginDescriptor descriptor;
-        private bool initialized = false;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="BasePlugin"/> class.
         /// </summary>
         /// <param name="pluginDescriptor">The plugin descriptor.</param>
         /// <exception cref="System.ArgumentNullException">pluginDescriptor</exception>
-        public BasePlugin(IPluginDescriptor pluginDescriptor)
+        protected BasePlugin(IPluginDescriptor pluginDescriptor)
         {
             if (pluginDescriptor == null)
-                throw new ArgumentNullException("pluginDescriptor");
-            descriptor = pluginDescriptor;
+                throw new ArgumentNullException(nameof(pluginDescriptor));
+            Descriptor = pluginDescriptor;
         }
 
         #region IPlugin Members
@@ -29,10 +24,7 @@ namespace Hawkeye.Extensibility
         /// <summary>
         /// Gets the descriptor instance that created this plugin.
         /// </summary>
-        public IPluginDescriptor Descriptor
-        {
-            get { return descriptor; }
-        }
+        public IPluginDescriptor Descriptor { get; }
 
         /// <summary>
         /// Initializes this plugin passing it the specified host.
@@ -41,9 +33,9 @@ namespace Hawkeye.Extensibility
         /// <exception cref="System.ArgumentNullException">host</exception>
         public void Initialize(IHawkeyeHost host)
         {
-            if (host == null) throw new ArgumentNullException("host");
+            if (host == null) throw new ArgumentNullException(nameof(host));
             Host = host;
-            initialized = true;
+            IsInitialized = true;
             OnInitialized();
         }
 
@@ -60,10 +52,7 @@ namespace Hawkeye.Extensibility
         /// <value>
         ///   <c>true</c> if initialized; otherwise, <c>false</c>.
         /// </value>
-        protected bool IsInitialized
-        {
-            get { return initialized; }
-        }
+        protected bool IsInitialized { get; private set; }
 
         /// <summary>
         /// Called when the plugin has just been initialized.
@@ -76,7 +65,7 @@ namespace Hawkeye.Extensibility
         /// <exception cref="System.InvalidOperationException">The plugin is not initialized.</exception>
         protected void EnsureInitialized()
         {
-            if (!initialized)
+            if (!IsInitialized)
                 throw new InvalidOperationException("The plugin is not initialized.");
         }
     }

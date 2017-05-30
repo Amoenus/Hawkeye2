@@ -39,17 +39,17 @@
     <Compile Include="BaseDecompilerPluginCore.cs" />
     <Compile Include="BaseDecompilerController.cs" />
     <Compile Include="IDecompilerController.cs" />
-    <Compile Include="ilspy\ILSpyController.cs" />
-    <Compile Include="ilspy\ILSpyPluginCore.cs" />
-    <Compile Include="ilspy\ILSpyPluginDescriptor.cs" />
+    <Compile Include="IlSpy\ILSpyController.cs" />
+    <Compile Include="IlSpy\ILSpyPluginCore.cs" />
+    <Compile Include="IlSpy\ILSpyPluginDescriptor.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="reflector\ReflectorController.cs" />
-    <Compile Include="reflector\ReflectorPluginCore.cs" />
-    <Compile Include="reflector\ReflectorPluginDescriptor.cs" />
+    <Compile Include="Reflector\ReflectorController.cs" />
+    <Compile Include="Reflector\ReflectorPluginCore.cs" />
+    <Compile Include="Reflector\ReflectorPluginDescriptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

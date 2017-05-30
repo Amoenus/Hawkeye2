@@ -12,7 +12,7 @@ namespace Hawkeye.Logging.log4net
 
         public LogServiceAppender(ILogService logServiceToAppend)
         {
-            if (logServiceToAppend == null) throw new ArgumentNullException("logServiceToAppend");
+            if (logServiceToAppend == null) throw new ArgumentNullException(nameof(logServiceToAppend));
             logService = logServiceToAppend;
         }
 

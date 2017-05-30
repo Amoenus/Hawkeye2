@@ -2,8 +2,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-using HawkeyeInjector;
-
 namespace HawkeyeBootstrap
 {
     internal static class Program

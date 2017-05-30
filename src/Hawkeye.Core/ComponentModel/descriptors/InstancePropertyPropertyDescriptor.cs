@@ -33,10 +33,7 @@ namespace Hawkeye.ComponentModel
         /// </summary>
         /// <returns>true if the property is read-only; otherwise, false.
         ///   </returns>
-        public override bool IsReadOnly
-        {
-            get { return !base.PropertyInfo.CanWrite; }
-        }
+        public override bool IsReadOnly => !base.PropertyInfo.CanWrite;
 
         /// <summary>
         /// When overridden in a derived class, gets the type of the component this property is bound to.
@@ -45,10 +42,7 @@ namespace Hawkeye.ComponentModel
         /// A <see cref="T:System.Type" /> that represents the type of component this property is bound to. When the <see cref="M:System.ComponentModel.PropertyDescriptor.GetValue(System.Object)" /> or <see cref="M:System.ComponentModel.PropertyDescriptor.SetValue(System.Object,System.Object)" /> methods are invoked, the object specified might be an instance of this type.
         ///   </returns>
         /// <exception cref="System.NotImplementedException"></exception>
-        public override Type ComponentType
-        {
-            get { return base.PropertyInfo.PropertyType; }
-        }
+        public override Type ComponentType => base.PropertyInfo.PropertyType;
 
         /// <summary>
         /// When overridden in a derived class, gets the type of the property.
@@ -56,14 +50,8 @@ namespace Hawkeye.ComponentModel
         /// <returns>
         /// A <see cref="T:System.Type" /> that represents the type of the property.
         ///   </returns>
-        public override Type PropertyType
-        {
-            get
-            {
-                return base.PropertyInfo.PropertyType == typeof(object) ?
-                    typeof(string) : base.PropertyInfo.PropertyType;
-            }
-        }
+        public override Type PropertyType => base.PropertyInfo.PropertyType == typeof(object) ?
+            typeof(string) : base.PropertyInfo.PropertyType;
 
         /// <summary>
         /// When overridden in a derived class, gets the current value of the property on a component.

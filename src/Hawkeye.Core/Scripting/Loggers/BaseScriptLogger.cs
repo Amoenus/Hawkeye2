@@ -1,10 +1,7 @@
 ﻿using Hawkeye.Scripting.Errors;
 using Hawkeye.Scripting.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 
 namespace Hawkeye.Scripting.Loggers
 {

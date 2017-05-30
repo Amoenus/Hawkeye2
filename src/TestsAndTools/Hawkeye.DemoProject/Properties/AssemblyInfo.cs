@@ -1,8 +1,6 @@
 ﻿// Hawkeye is licensed under the terms of the Microsoft Reciprocal License (Ms-RL)
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 #if DOTNET4
 [assembly: AssemblyTitle("Hawkeye.DemoProject.N4")]

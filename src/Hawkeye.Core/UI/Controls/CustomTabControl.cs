@@ -301,10 +301,7 @@ namespace Hawkeye.UI.Controls
         /// <value>
         /// 	<c>true</c> if this tab control is horizontal; otherwise, <c>false</c>.
         /// </value>
-        private bool IsHorizontal
-        {
-            get { return base.Alignment == TabAlignment.Top || base.Alignment == TabAlignment.Bottom; }
-        }
+        private bool IsHorizontal => base.Alignment == TabAlignment.Top || base.Alignment == TabAlignment.Bottom;
 
         /// <summary>
         /// Paints the selected tab.

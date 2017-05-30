@@ -30,7 +30,7 @@ namespace Hawkeye.Configuration
             /// <value>
             ///   <c>true</c> if this store is read only; otherwise, <c>false</c>.
             /// </value>
-            public bool IsReadOnly { get { return false; } }
+            public bool IsReadOnly => false;
 
             #endregion
         }
@@ -46,7 +46,7 @@ namespace Hawkeye.Configuration
             /// <exception cref="System.ArgumentNullException"></exception>
             public ReadOnlyStoreWrapper(ISettingsStore store)
             {
-                if (store == null) throw new ArgumentNullException("store");
+                if (store == null) throw new ArgumentNullException(nameof(store));
                 wrapped = store;
             }
 
@@ -74,7 +74,7 @@ namespace Hawkeye.Configuration
             /// <value>
             ///   <c>true</c> if this store is read only; otherwise, <c>false</c>.
             /// </value>
-            public bool IsReadOnly { get { return true; } }
+            public bool IsReadOnly => true;
 
             #endregion
         }

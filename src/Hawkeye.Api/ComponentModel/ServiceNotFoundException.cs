@@ -2,11 +2,12 @@
 using System.Globalization;
 using System.Security.Permissions;
 using System.Runtime.Serialization;
+using Hawkeye.extensions;
 
 namespace Hawkeye.ComponentModel
 {
     /// <summary>
-    /// This exception is thrown by the <see cref="Hawkeye.ServiceExtensions.GetService{T}(System.IServiceProvider)"/>
+    /// This exception is thrown by the <see cref="ServiceExtensions.GetService{T}(System.IServiceProvider)"/>
     /// method, when specifying the <b>mandatory</b> parameter and when the requested service is not found.
     /// </summary>
     [Serializable]
@@ -102,7 +103,7 @@ namespace Hawkeye.ComponentModel
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (info == null) throw new ArgumentNullException("info");
+            if (info == null) throw new ArgumentNullException(nameof(info));
             info.AddValue("ServiceType", serviceType);
             base.GetObjectData(info, context);
         }

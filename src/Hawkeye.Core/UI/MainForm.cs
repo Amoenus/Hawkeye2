@@ -58,10 +58,7 @@ namespace Hawkeye.UI
             }
         }
 
-        internal MainControl MainControl
-        {
-            get { return mainControl; }
-        }
+        internal MainControl MainControl => mainControl;
 
         public void SetTarget(IntPtr hwnd)
         {

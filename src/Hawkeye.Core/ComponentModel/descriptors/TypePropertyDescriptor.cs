@@ -11,7 +11,7 @@ namespace Hawkeye.ComponentModel
         public TypePropertyDescriptor(object ownerObject)
             : base(propertyName, null)
         {
-            if (ownerObject == null) throw new ArgumentNullException("ownerObject");
+            if (ownerObject == null) throw new ArgumentNullException(nameof(ownerObject));
             ownerType = ownerObject.GetType();
         }
 
@@ -20,25 +20,16 @@ namespace Hawkeye.ComponentModel
             return false;
         }
 
-        public override Type ComponentType
-        {
-            get { return ownerType; }
-        }
+        public override Type ComponentType => ownerType;
 
         public override object GetValue(object component)
         {
             return ownerType;
         }
 
-        public override bool IsReadOnly
-        {
-            get { return true; }
-        }
+        public override bool IsReadOnly => true;
 
-        public override Type PropertyType
-        {
-            get { return typeof(Type); }
-        }
+        public override Type PropertyType => typeof(Type);
 
         public override void ResetValue(object component)
         {

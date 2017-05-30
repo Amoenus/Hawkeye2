@@ -8,16 +8,14 @@ namespace FxDetector
 {
     internal static class This
     {
-        public static bool IsX64
-        {
-            get { return IntPtr.Size == 8; }
-        }
+        public static bool IsX64 => IntPtr.Size == 8;
     }
 
-    internal class ErrorBox
+    internal static class ErrorBox
     {
         public static DialogResult Show(string text) { return Show(null, text); }
-        public static DialogResult Show(IWin32Window owner, string text)
+
+        private static DialogResult Show(IWin32Window owner, string text)
         {
             return MessageBox.Show(
                 owner, text, "Error",

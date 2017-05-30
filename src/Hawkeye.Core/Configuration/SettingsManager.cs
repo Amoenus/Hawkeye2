@@ -8,10 +8,10 @@ namespace Hawkeye.Configuration
 {
     internal static partial class SettingsManager
     {
-        private static readonly string defaultSettingsFileName = "hawkeye.settings";
-        private static readonly ILogService log = LogManager.GetLogger(typeof(SettingsManager));
-        private static string settingsFileName = string.Empty;
-        private static SettingsManagerImplementation implementation = null;
+        private static readonly string DefaultSettingsFileName = "hawkeye.settings";
+        private static readonly ILogService Log = LogManager.GetLogger(typeof(SettingsManager));
+        private static string _settingsFileName = string.Empty;
+        private static SettingsManagerImplementation _implementation = null;
 
         public static readonly string HawkeyeStoreKey = "hawkeye";
 
@@ -19,13 +19,13 @@ namespace Hawkeye.Configuration
         {
             get
             {
-                if (implementation == null)
+                if (_implementation == null)
                     throw new ApplicationException("SettingsManager class was not initialized.");
-                return implementation;
+                return _implementation;
             }
         }
 
-        public static string SettingsFileName => settingsFileName;
+        public static string SettingsFileName => _settingsFileName;
 
         /// <summary>
         /// Initializes the Settings manager with the specified filename.
@@ -37,18 +37,18 @@ namespace Hawkeye.Configuration
             try
             {
                 if (string.IsNullOrEmpty(resolved))
-                    resolved = defaultSettingsFileName;
+                    resolved = DefaultSettingsFileName;
 
                 if (!Path.IsPathRooted(resolved)) // combine with default directory
                     resolved = Path.Combine(
                         HawkeyeApplication.Shell.ApplicationInfo.ApplicationDataDirectory, resolved);
 
-                settingsFileName = resolved; // This is the settings file
+                _settingsFileName = resolved; // This is the settings file
 
-                implementation = new SettingsManagerImplementation();
-                if (!File.Exists(settingsFileName)) // Check file exists
-                    implementation.CreateDefaultSettingsFile(settingsFileName);
-                implementation.Load(settingsFileName);
+                _implementation = new SettingsManagerImplementation();
+                if (!File.Exists(_settingsFileName)) // Check file exists
+                    _implementation.CreateDefaultSettingsFile(_settingsFileName);
+                _implementation.Load(_settingsFileName);
             }
             catch (Exception ex)
             {
@@ -57,7 +57,7 @@ namespace Hawkeye.Configuration
                 builder.AppendFormat("\t- Provided settings file name was: '{0}'.", filename ?? "[NULL]");
                 builder.AppendFormat("\t- Resolved settings file name was: '{0}'.", resolved ?? "[NULL]");
                 builder.AppendFormat("\t- Error is: {0}.", ex.Message);
-                log.Error(builder.ToString(), ex);
+                Log.Error(builder.ToString(), ex);
 #if DEBUG
                 throw;
 #endif
@@ -76,7 +76,7 @@ namespace Hawkeye.Configuration
 
         public static void Save()
         {
-            Implementation.Save(settingsFileName);
+            Implementation.Save(_settingsFileName);
         }
     }
 }

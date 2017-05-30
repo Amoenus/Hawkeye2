@@ -8,7 +8,7 @@ namespace Hawkeye.Configuration
     {
         private class SettingsStore : ISettingsStore
         {
-            private static readonly ILogService log = LogManager.GetLogger<SettingsStore>();
+            private static readonly ILogService Log = LogManager.GetLogger<SettingsStore>();
 
             #region ISettingsStore Members
 
@@ -37,7 +37,7 @@ namespace Hawkeye.Configuration
 
         internal class ReadOnlyStoreWrapper : ISettingsStore
         {
-            private ISettingsStore wrapped = null;
+            private ISettingsStore _wrapped = null;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ReadOnlyStoreWrapper" /> class.
@@ -47,7 +47,7 @@ namespace Hawkeye.Configuration
             public ReadOnlyStoreWrapper(ISettingsStore store)
             {
                 if (store == null) throw new ArgumentNullException(nameof(store));
-                wrapped = store;
+                _wrapped = store;
             }
 
             #region ISettingsStore Members
@@ -61,7 +61,7 @@ namespace Hawkeye.Configuration
             /// <exception cref="System.NotSupportedException"></exception>
             public string Content
             {
-                get { return wrapped.Content; }
+                get { return _wrapped.Content; }
                 set
                 {
                     throw new NotSupportedException("This Settings Store is Read-Only.");

@@ -11,9 +11,9 @@ namespace Hawkeye.ComponentModel
 {
     internal static class ComponentModelExtensions
     {
-        private static ILogService log = LogManager.GetLogger(typeof(ComponentModelExtensions));
+        private static readonly ILogService Log = LogManager.GetLogger(typeof(ComponentModelExtensions));
 
-        private static readonly string[] excludedProperties = new[]
+        private static readonly string[] ExcludedProperties = new[]
         {
             "System.Windows.Forms.Control.ShowParams",
             "System.Windows.Forms.Control.ActiveXAmbientBackColor",
@@ -25,13 +25,13 @@ namespace Hawkeye.ComponentModel
             "System.Windows.Forms.Form.ShowParams",
         };
 
-        private static readonly string[] excludedEvents = new string[0];
+        private static readonly string[] ExcludedEvents = new string[0];
 
-        private static readonly BindingFlags instanceFlags =
+        private static readonly BindingFlags InstanceFlags =
             BindingFlags.Instance | BindingFlags.InvokeMethod |
             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
-        private static readonly BindingFlags staticFlags =
+        private static readonly BindingFlags StaticFlags =
             BindingFlags.Static | BindingFlags.InvokeMethod |
             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
@@ -61,25 +61,25 @@ namespace Hawkeye.ComponentModel
                     if (allprops.ContainsKey(pi.Name)) return;
 
                     var fullName = pi.DeclaringType.FullName + "." + pi.Name;
-                    if (excludedProperties.Contains(fullName)) return;
+                    if (ExcludedProperties.Contains(fullName)) return;
 
                     if (isStatic) allprops.Add(pi.Name, new StaticPropertyPropertyDescriptor(type, pi, keepOriginalCategoryAttribute));
                     else allprops.Add(pi.Name, new InstancePropertyPropertyDescriptor(component, type, pi, keepOriginalCategoryAttribute));
                 }
                 catch (Exception ex)
                 {
-                    log.Error($"Could not convert a property info into a property descriptor: {ex.Message}", ex);
+                    Log.Error($"Could not convert a property info into a property descriptor: {ex.Message}", ex);
                 }
             };
 
             int depth = 1;
             do
             {
-                foreach (var pi in type.GetProperties(instanceFlags))
+                foreach (var pi in type.GetProperties(InstanceFlags))
                     addPropertyDescriptor(pi, false);
 
                 if (retrieveStaticMembers)
-                    foreach (var pi in type.GetProperties(staticFlags))
+                    foreach (var pi in type.GetProperties(StaticFlags))
                         addPropertyDescriptor(pi, true);
 
                 if (type == typeof(object) || !inspectBaseClasses)
@@ -109,33 +109,16 @@ namespace Hawkeye.ComponentModel
 
             var allevs = new Dictionary<string, PropertyDescriptor>();
 
-            Action<EventInfo, bool> addPropertyDescriptor = (ei, isStatic) =>
-            {
-                try
-                {
-                    if (allevs.ContainsKey(ei.Name)) return;
-
-                    var fullName = ei.DeclaringType.FullName + "." + ei.Name;
-                    if (excludedEvents.Contains(fullName)) return;
-
-                    if (isStatic) allevs.Add(ei.Name, new StaticEventPropertyDescriptor(type, ei, keepOriginalCategoryAttribute));
-                    else allevs.Add(ei.Name, new InstanceEventPropertyDescriptor(component, type, ei, keepOriginalCategoryAttribute));
-
-                }
-                catch (Exception ex)
-                {
-                    log.Error($"Could not convert an event info into a property descriptor: {ex.Message}", ex);
-                }
-            };
+            Action<EventInfo, bool> addPropertyDescriptor = AddPropertyDescriptor(component, keepOriginalCategoryAttribute, allevs, type);
 
             int depth = 1;
             do
             {
-                foreach (var ei in type.GetEvents(instanceFlags))
+                foreach (var ei in type.GetEvents(InstanceFlags))
                     addPropertyDescriptor(ei, false);
 
                 if (retrieveStaticMembers)
-                    foreach (var ei in type.GetEvents(staticFlags))
+                    foreach (var ei in type.GetEvents(StaticFlags))
                         addPropertyDescriptor(ei, true);
 
                 if (type == typeof(object) || !inspectBaseClasses)
@@ -149,26 +132,40 @@ namespace Hawkeye.ComponentModel
             return new PropertyDescriptorCollection(allevs.Values.ToArray());
         }
 
-        ////public static PropertyDescriptorCollection GetInstanceEvents(
-        ////    this ITypeDescriptorContext context,
-        ////    object component, 
-        ////    bool keepOriginalCategoryAttribute = true)
-        ////{
-        ////    return GetAllEvents(context, component, true, false, keepOriginalCategoryAttribute);
-        ////}
+        private static Action<EventInfo, bool> AddPropertyDescriptor(object component, bool keepOriginalCategoryAttribute, Dictionary<string, PropertyDescriptor> allevs, Type type)
+        {
+            return (ei, isStatic) =>
+            {
+                try
+                {
+                    if (allevs.ContainsKey(ei.Name)) return;
+
+                    var fullName = ei.DeclaringType.FullName + "." + ei.Name;
+                    if (ExcludedEvents.Contains(fullName)) return;
+
+                    if (isStatic) allevs.Add(ei.Name, new StaticEventPropertyDescriptor(type, ei, keepOriginalCategoryAttribute));
+                    else allevs.Add(ei.Name, new InstanceEventPropertyDescriptor(component, type, ei, keepOriginalCategoryAttribute));
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Could not convert an event info into a property descriptor: {ex.Message}", ex);
+                }
+            };
+        }
 
         #endregion
 
         #region PropertyInfo extensions
 
-        public static object Get(this PropertyInfo pinfo, object target, ref string criticalError)
+        public static object Get(this PropertyInfo propertyInfo, object target, ref string criticalError)
         {
             if (!string.IsNullOrEmpty(criticalError))
                 return criticalError;
 
             try
             {
-                var get = pinfo.GetGetMethod(true);
+                var get = propertyInfo.GetGetMethod(true);
                 if (get != null)
                     return get.Invoke(target, new object[] { });
                 else criticalError = "No Get Method.";
@@ -187,19 +184,19 @@ namespace Hawkeye.ComponentModel
             }
             catch (TargetInvocationException ex)
             {
-                criticalError = ex.InnerException.Message;
+                criticalError = ex.InnerException?.Message;
             }
             return criticalError;
         }
 
-        public static object Set(this PropertyInfo pinfo, object target, object value, ref string criticalError)
+        public static object Set(this PropertyInfo propertyInfo, object target, object value, ref string criticalError)
         {
             if (!string.IsNullOrEmpty(criticalError))
                 return criticalError;
 
             try
             {
-                var set = pinfo.GetSetMethod(true);
+                var set = propertyInfo.GetSetMethod(true);
                 if (set != null)
                     return set.Invoke(target, new object[] { value });
                 else criticalError = "No Set Method.";
@@ -218,7 +215,7 @@ namespace Hawkeye.ComponentModel
             }
             catch (TargetInvocationException ex)
             {
-                criticalError = ex.InnerException.Message;
+                criticalError = ex.InnerException?.Message;
             }
             return criticalError;
         }

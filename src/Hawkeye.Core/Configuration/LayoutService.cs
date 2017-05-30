@@ -46,7 +46,7 @@ namespace Hawkeye.Configuration
 
         private class EventsSuspender : IDisposable
         {
-            private LayoutService service = null;
+            private LayoutService _service = null;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="EventsSuspender" /> class.
@@ -54,8 +54,8 @@ namespace Hawkeye.Configuration
             /// <param name="layoutManager">The layout manager.</param>
             public EventsSuspender(LayoutService layoutService)
             {
-                service = layoutService;
-                service.eventsAreSuspended = true;
+                _service = layoutService;
+                _service._eventsAreSuspended = true;
             }
 
             #region IDisposable Members
@@ -65,29 +65,29 @@ namespace Hawkeye.Configuration
             /// </summary>
             public void Dispose()
             {
-                service.eventsAreSuspended = false;
+                _service._eventsAreSuspended = false;
             }
 
             #endregion
         }
 
-        private static readonly ILogService log = LogManager.GetLogger<LayoutService>();
+        private static readonly ILogService Log = LogManager.GetLogger<LayoutService>();
 
-        private bool eventsAreSuspended = false;
-        private Rectangle defaultBounds = Rectangle.Empty;
-        private List<string> loadedList = new List<string>();
-        private Dictionary<string, Form> forms = new Dictionary<string, Form>();
-        private Dictionary<string, FormLayoutData> layouts = new Dictionary<string, FormLayoutData>();
+        private bool _eventsAreSuspended = false;
+        private Rectangle _defaultBounds = Rectangle.Empty;
+        private List<string> _loadedList = new List<string>();
+        private Dictionary<string, Form> _forms = new Dictionary<string, Form>();
+        private Dictionary<string, FormLayoutData> _layouts = new Dictionary<string, FormLayoutData>();
 
-        private Func<XmlNode> getLayoutsRootNode = null;
+        private Func<XmlNode> _getLayoutsRootNode = null;
 
         public LayoutService(Func<XmlNode> layoutsRootNodeFunc)
         {
-            getLayoutsRootNode = layoutsRootNodeFunc;
+            _getLayoutsRootNode = layoutsRootNodeFunc;
             LoadLayouts();
         }
 
-        private bool EventsLocked => eventsAreSuspended;
+        private bool EventsLocked => _eventsAreSuspended;
 
         /// <summary>
         /// Suspends the forms events from being observed by this service.
@@ -107,8 +107,8 @@ namespace Hawkeye.Configuration
         /// <param name="form">The form instance.</param>
         public void RegisterForm(string key, Form form)
         {
-            if (forms.ContainsKey(key)) forms.Remove(key);
-            forms.Add(key, form);
+            if (_forms.ContainsKey(key)) _forms.Remove(key);
+            _forms.Add(key, form);
             LoadForm(key);
             form.Load += (s, e) => LoadForm(key);
         }
@@ -134,7 +134,7 @@ namespace Hawkeye.Configuration
 
         private void LoadLayouts()
         {
-            LoadLayouts(getLayoutsRootNode());
+            LoadLayouts(_getLayoutsRootNode());
         }
 
         private void LoadLayouts(XmlNode rootLayoutsNode)
@@ -149,14 +149,14 @@ namespace Hawkeye.Configuration
                 }
                 catch (Exception ex)
                 {
-                    log.Error($"Unable to deserialize layout information for key {key}.", ex);
+                    Log.Error($"Unable to deserialize layout information for key {key}.", ex);
                 }
             }
         }
 
         private void LoadLayout(XmlNode layoutNode, string key)
         {
-            if (layouts.ContainsKey(key)) return;
+            if (_layouts.ContainsKey(key)) return;
 
             var layoutData = new FormLayoutData();
             foreach (XmlNode xn in layoutNode.ChildNodes)
@@ -173,13 +173,13 @@ namespace Hawkeye.Configuration
                             }
                             catch (Exception ex)
                             {
-                                log.Warning($"Invalid 'bounds' value for key {key}: {bounds}", ex);
+                                Log.Warning($"Invalid 'bounds' value for key {key}: {bounds}", ex);
                                 layoutData.Bounds = null;
                             }
                         }
                         else
                         {
-                            log.Warning($"'bounds' value for key {key} was not found.");
+                            Log.Warning($"'bounds' value for key {key} was not found.");
                             layoutData.Bounds = null;
                         }
                         break;
@@ -193,7 +193,7 @@ namespace Hawkeye.Configuration
                             }
                             catch (Exception ex)
                             {
-                                log.Warning(string.Format(
+                                Log.Warning(string.Format(
                                     "Invalid 'state' value for key {0}: {2}",
                                     key, state), ex);
                                 layoutData.WindowState = null;
@@ -201,7 +201,7 @@ namespace Hawkeye.Configuration
                         }
                         else
                         {
-                            log.Warning($"'state' value for key {key} was not found.");
+                            Log.Warning($"'state' value for key {key} was not found.");
                             layoutData.WindowState = null;
                         }
                         break;
@@ -213,7 +213,7 @@ namespace Hawkeye.Configuration
                         break;
                 }
             }
-            layouts.Add(key, layoutData);
+            _layouts.Add(key, layoutData);
         }
 
         private string GetNodeValue(XmlNode xn)
@@ -236,7 +236,7 @@ namespace Hawkeye.Configuration
 
         internal void SaveLayouts()
         {
-            SaveLayouts(getLayoutsRootNode());
+            SaveLayouts(_getLayoutsRootNode());
         }
 
         private void SaveLayouts(XmlNode rootLayoutsNode)
@@ -258,7 +258,7 @@ namespace Hawkeye.Configuration
                 return null;
             };
 
-            foreach (string key in layouts.Keys)
+            foreach (string key in _layouts.Keys)
             {
                 var xn = findLayoutNode(key);
                 if (xn == null)
@@ -270,7 +270,7 @@ namespace Hawkeye.Configuration
                 }
 
                 // mandatory, if not present, skip this node
-                var layout = layouts[key];
+                var layout = _layouts[key];
                 if (layout == null) continue;
 
                 if (layout.Bounds.HasValue)
@@ -339,7 +339,7 @@ namespace Hawkeye.Configuration
 
         private bool IsLoaded(string key)
         {
-            return loadedList.Contains(key);
+            return _loadedList.Contains(key);
         }
 
         /// <summary>
@@ -352,14 +352,14 @@ namespace Hawkeye.Configuration
 
             using (SuspendEvents())
             {
-                if (!forms.ContainsKey(key)) return;
+                if (!_forms.ContainsKey(key)) return;
 
-                var form = forms[key];
+                var form = _forms[key];
                 var defaultScreen = Screen.PrimaryScreen;
 
-                if (layouts.ContainsKey(key))
+                if (_layouts.ContainsKey(key))
                 {
-                    var layout = layouts[key];
+                    var layout = _layouts[key];
 
                     // Determine screen
                     var screenName = layout.ScreenName;
@@ -375,7 +375,7 @@ namespace Hawkeye.Configuration
                             SetDefaultLayout(form);
                         else form.Bounds = bounds;
                     }
-                    else log.Verbose($"Could not find a 'bounds' value for layout key {key}");
+                    else Log.Verbose($"Could not find a 'bounds' value for layout key {key}");
 
                     if (layout.WindowState.HasValue)
                     {
@@ -388,7 +388,7 @@ namespace Hawkeye.Configuration
                     {
                         // default to Normal
                         form.WindowState = FormWindowState.Normal;
-                        log.Verbose($"Could not find a 'state' value for layout key {key}");
+                        Log.Verbose($"Could not find a 'state' value for layout key {key}");
                     }
 
                     // If state is Normal and we have no bounds, use DefaultBounds and center on screen
@@ -398,20 +398,20 @@ namespace Hawkeye.Configuration
                 else
                 {
                     SetDefaultLayout(form);
-                    layouts.Add(key, new FormLayoutData(form));
+                    _layouts.Add(key, new FormLayoutData(form));
                 }
 
                 form.SizeChanged += (s, e) => UpdateForm(key);
                 form.LocationChanged += (s, e) => UpdateForm(key);
                 form.FormClosed += (s, e) => UnloadForm(key);
 
-                loadedList.Add(key);
+                _loadedList.Add(key);
 
                 UpdateForm(key);
 
                 // Even if no additional data was saved, call SetData.
                 if (form is IAdditionalLayoutDataProvider)
-                    ((IAdditionalLayoutDataProvider)form).SetAdditionalLayoutData(layouts[key].AdditionalData);
+                    ((IAdditionalLayoutDataProvider)form).SetAdditionalLayoutData(_layouts[key].AdditionalData);
             }
         }
 
@@ -426,9 +426,9 @@ namespace Hawkeye.Configuration
 
             using (SuspendEvents())
             {
-                if (!forms.ContainsKey(key)) return;
-                var form = forms[key];
-                var layout = layouts[key];
+                if (!_forms.ContainsKey(key)) return;
+                var form = _forms[key];
+                var layout = _layouts[key];
 
                 layout.WindowState = form.WindowState;
                 layout.Bounds = form.Bounds;
@@ -444,17 +444,17 @@ namespace Hawkeye.Configuration
         {
             UpdateForm(key);
 
-            if (layouts.ContainsKey(key))
+            if (_layouts.ContainsKey(key))
             {
-                var layout = layouts[key];
-                var form = forms[key];
+                var layout = _layouts[key];
+                var form = _forms[key];
                 if (form is IAdditionalLayoutDataProvider)
                     layout.AdditionalData = ((IAdditionalLayoutDataProvider)form).GetAdditionalLayoutData();
             }
 
             SaveLayouts();
 
-            loadedList.Remove(key);
+            _loadedList.Remove(key);
         }
 
         #endregion
@@ -494,7 +494,7 @@ namespace Hawkeye.Configuration
                     try { return converter.ConvertFrom(null, CultureInfo.InvariantCulture, value); }
                     catch (Exception ex)
                     {
-                        log.Verbose($"Unable to convert {value} to a {targetType} using invariant culture.", ex);
+                        Log.Verbose($"Unable to convert {value} to a {targetType} using invariant culture.", ex);
 
                         // Then, second chance: we use the current culture.
                         return converter.ConvertFrom(null, Thread.CurrentThread.CurrentCulture, value);

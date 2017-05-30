@@ -13,12 +13,12 @@ namespace Hawkeye.Configuration
     {
         private class SettingsManagerImplementation
         {
-            private const string implementationVersion = "1.0.0";
+            private const string ImplementationVersion = "1.0.0";
 
-            private static readonly ILogService log = LogManager.GetLogger<SettingsManagerImplementation>();
+            private static readonly ILogService Log = LogManager.GetLogger<SettingsManagerImplementation>();
             
-            private Dictionary<string, SettingsStore> stores = new Dictionary<string, SettingsStore>();
-            private XmlDocument settingsDocument = null;
+            private Dictionary<string, SettingsStore> _stores = new Dictionary<string, SettingsStore>();
+            private XmlDocument _settingsDocument = null;
 
             public ISettingsStore GetStore(string key)
             {
@@ -45,18 +45,18 @@ namespace Hawkeye.Configuration
 
             public void Load(string filename)
             {
-                if (settingsDocument == null)
+                if (_settingsDocument == null)
                 {
-                    settingsDocument = new XmlDocument();
-                    settingsDocument.Load(filename);
+                    _settingsDocument = new XmlDocument();
+                    _settingsDocument.Load(filename);
                 }
 
-                var rootNode = settingsDocument.ChildNodes.Cast<XmlNode>().SingleOrDefault(xn => xn.Name == "settings");
+                var rootNode = _settingsDocument.ChildNodes.Cast<XmlNode>().SingleOrDefault(xn => xn.Name == "settings");
                 if (rootNode == null)
                 {
-                    rootNode = settingsDocument.CreateElement("settings");
-                    var versionNode = settingsDocument.CreateAttribute("version");
-                    versionNode.Value = implementationVersion;
+                    rootNode = _settingsDocument.CreateElement("settings");
+                    var versionNode = _settingsDocument.CreateAttribute("version");
+                    versionNode.Value = ImplementationVersion;
                     rootNode.Attributes.Append(versionNode);
                     return;
                 }
@@ -65,7 +65,7 @@ namespace Hawkeye.Configuration
                 if (children.Count() == 0)
                 {
                     // Add Hawkeye node
-                    rootNode.AppendChild(settingsDocument.CreateElement(HawkeyeStoreKey));
+                    rootNode.AppendChild(_settingsDocument.CreateElement(HawkeyeStoreKey));
                     return;
                 }
 
@@ -98,14 +98,14 @@ namespace Hawkeye.Configuration
             {
                 var store = new SettingsStore();
                 store.Content = node.InnerText;
-                stores.Add(storeKey, store);
+                _stores.Add(storeKey, store);
             }
 
             public void Save(string filename)
             {
                 CreateBackup(filename);
                 // TODO: save settings
-                settingsDocument.Save(filename);
+                _settingsDocument.Save(filename);
             }
 
             private void CreateBackup(string filename)
@@ -120,7 +120,7 @@ namespace Hawkeye.Configuration
                     }
                     catch (Exception ex)
                     {
-                        log.Error($"Could not createb backup copy of settings file: {ex.Message}", ex);
+                        Log.Error($"Could not createb backup copy of settings file: {ex.Message}", ex);
                     }
                 }
             }

@@ -10,8 +10,8 @@ namespace Hawkeye.Extensibility
 {
     internal class PluginManager
     {
-        private static readonly ILogService log = LogManager.GetLogger<PluginManager>();
-        private const string pluginsSubDirectory = "plugins";
+        private static readonly ILogService Log = LogManager.GetLogger<PluginManager>();
+        private const string PluginsSubDirectory = "plugins";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PluginManager"/> class.
@@ -19,7 +19,7 @@ namespace Hawkeye.Extensibility
         public PluginManager()
         {
             // Just so that it does not return null;
-            PluginDescriptors = new IPluginDescriptor[0]; 
+            PluginDescriptors = new IPluginDescriptor[0];
         }
 
         /// <summary>
@@ -38,11 +38,11 @@ namespace Hawkeye.Extensibility
         public void DiscoverAll()
         {
             var directory = Path.Combine(
-                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), pluginsSubDirectory);
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), PluginsSubDirectory);
 
             if (!Directory.Exists(directory))
             {
-                log.Debug($"No Plugins directory ({directory}).");
+                Log.Debug($"No Plugins directory ({directory}).");
                 return;
             }
 
@@ -50,17 +50,17 @@ namespace Hawkeye.Extensibility
 
             foreach (var file in Directory.GetFiles(directory, "*.dll"))
             {
-                log.Debug($"Examining File {file} for plugins:");
+                Log.Debug($"Examining File {file} for plugins:");
                 try
                 {
-                    var assy = Assembly.LoadFile(file);
-                    var types = assy.GetTypes().Where(t => t.IsA<IPluginDescriptor>()).ToArray();
+                    var assembly = Assembly.LoadFile(file);
+                    var types = assembly.GetTypes().Where(t => t.IsA<IPluginDescriptor>()).ToArray();
 
                     if (types == null || types.Length == 0)
-                        log.Debug("--> No plugins in this assembly");
+                        Log.Debug("--> No plugins in this assembly");
                     else
                     {
-                        log.Debug($"--> {types.Length} plugins were found in this assembly");
+                        Log.Debug($"--> {types.Length} plugins were found in this assembly");
                         foreach (var type in types)
                         {
                             try
@@ -70,14 +70,14 @@ namespace Hawkeye.Extensibility
                             }
                             catch (Exception ex)
                             {
-                                log.Error($"----> Could not create an instance of type {type}: {ex.Message}", ex);
+                                Log.Error($"----> Could not create an instance of type {type}: {ex.Message}", ex);
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    log.Debug($"--> Not an assembly: {ex.Message}");
+                    Log.Debug($"--> Not an assembly: {ex.Message}");
                 }
             }
 
@@ -85,7 +85,7 @@ namespace Hawkeye.Extensibility
         }
 
         /// <summary>
-        /// Loads all the plugins (passing them the specified host) 
+        /// Loads all the plugins (passing them the specified host)
         /// from previously discovered plugin descriptors.
         /// </summary>
         /// <param name="host">The host.</param>
@@ -99,19 +99,19 @@ namespace Hawkeye.Extensibility
                 try
                 {
                     pluginName = descriptor.Name;
-                    log.Debug($"Loading plugin '{pluginName}':");
+                    Log.Debug($"Loading plugin '{pluginName}':");
                     var instance = descriptor.Create(host);
                     if (instance == null)
-                        log.Warning("--> Created plugin is null. Nothing to load.");
+                        Log.Warning("--> Created plugin is null. Nothing to load.");
                     else
                     {
                         plugins.Add(instance);
-                        log.Debug("--> OK");
+                        Log.Debug("--> OK");
                     }
                 }
                 catch (Exception ex)
                 {
-                    log.Error($"--> Plugin '{pluginName}' could not be loaded: {ex.Message}", ex);
+                    Log.Error($"--> Plugin '{pluginName}' could not be loaded: {ex.Message}", ex);
                 }
             }
 

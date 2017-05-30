@@ -11,13 +11,13 @@ namespace Hawkeye.ComponentModel
         private List<T> list = new List<T>();
         private int index = -1;
 
-        public T Current 
+        public T Current
         {
-            get 
+            get
             {
                 if (index == -1) return default(T);
                 if (index >= list.Count) throw new InvalidOperationException();
-                return list[index]; 
+                return list[index];
             }
         }
 

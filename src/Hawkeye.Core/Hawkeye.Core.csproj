@@ -178,7 +178,7 @@
     <Compile Include="UI\WindowFinderControl.Designer.cs">
       <DependentUpon>WindowFinderControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="WinApi\constants.cs" />
+    <Compile Include="WinApi\Constants.cs" />
     <Compile Include="WinApi\CursorHelper.cs" />
     <Compile Include="ComponentModel\ControlInfo.cs" />
     <Compile Include="ComponentModel\ModuleInfo.cs" />

@@ -5,19 +5,19 @@ namespace Hawkeye.Reflection
 {
     internal class PropertyAccessor
     {
-        private static readonly BindingFlags[] flagsToExamine;
+        private static readonly BindingFlags[] FlagsToExamine;
 
-        private readonly string name;
-        private readonly Type targetType;
-        private readonly object target;
-        private readonly PropertyInfo info;
+        private readonly string _name;
+        private readonly Type _targetType;
+        private readonly object _target;
+        private readonly PropertyInfo _info;
         
         /// <summary>
         /// Initializes the <see cref="PropertyAccessor"/> class.
         /// </summary>
         static PropertyAccessor()
         {
-            flagsToExamine = new[]
+            FlagsToExamine = new[]
             {
                 BindingFlags.Default,
                 BindingFlags.Instance | BindingFlags.FlattenHierarchy,
@@ -61,56 +61,56 @@ namespace Hawkeye.Reflection
         /// <param name="propertyName">Name of the property.</param>
         private PropertyAccessor(Type propertyTargetType, object propertyTarget, string propertyName)
         {
-            target = propertyTarget;
-            targetType = propertyTargetType;
-            name = propertyName;
+            _target = propertyTarget;
+            _targetType = propertyTargetType;
+            _name = propertyName;
 
             do
             {
-                foreach (var flagToExamine in flagsToExamine)
+                foreach (var flagToExamine in FlagsToExamine)
                 {
                     var candidate = FindProperty(flagToExamine);
                     if (candidate != null)
                     {
-                        info = candidate;
+                        _info = candidate;
                         break;
                     }
                 }
 
-                if (info == null)
+                if (_info == null)
                 {
-                    targetType = targetType.BaseType;
-                    if (targetType == typeof(object))
+                    _targetType = _targetType.BaseType;
+                    if (_targetType == typeof(object))
                         break;
                 }
 
-            } while (info == null);
+            } while (_info == null);
         }
 
-        public object Target => target;
+        public object Target => _target;
 
-        public bool IsValid => info != null;
+        public bool IsValid => _info != null;
 
         public object Get(object operationTarget = null)
         {
-            return info.GetValue(operationTarget ?? target, null);
+            return _info.GetValue(operationTarget ?? _target, null);
         }
 
         public void Set(object newValue, object operationTarget = null)
         {
-            info.SetValue(operationTarget ?? target, newValue, null);
+            _info.SetValue(operationTarget ?? _target, newValue, null);
         }
 
         private PropertyInfo FindProperty(BindingFlags flags)
         {
-            var propertyInfo = targetType.GetProperty(name, flags);
+            var propertyInfo = _targetType.GetProperty(_name, flags);
             if (propertyInfo != null)
                 return propertyInfo;
 
-            var allProperties = targetType.GetProperties(flags);
+            var allProperties = _targetType.GetProperties(flags);
             foreach (var pinfo in allProperties)
             {
-                if (pinfo.Name == name)
+                if (pinfo.Name == _name)
                     return pinfo;
             }
 

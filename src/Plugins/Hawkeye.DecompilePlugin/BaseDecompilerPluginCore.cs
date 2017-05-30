@@ -2,6 +2,7 @@
 using Hawkeye.Logging;
 using System.Windows.Forms;
 using Hawkeye.DecompilePlugin.Reflector;
+using Hawkeye.Extensions;
 
 namespace Hawkeye.DecompilePlugin
 {

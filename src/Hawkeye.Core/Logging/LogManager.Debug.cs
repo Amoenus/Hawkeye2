@@ -48,7 +48,7 @@ namespace Hawkeye.Logging
             /// Logs the specified log entry.
             /// </summary>
             /// <param name="entry">The entry to log.</param>
-            public override void Log(ILogEntry entry)
+            public override void LogEntry(ILogEntry entry)
             {
                 entry.Source = SourceType.Name;
                 Debug.WriteLine(entry.ToString());

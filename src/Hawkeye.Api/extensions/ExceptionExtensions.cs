@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Hawkeye
+namespace Hawkeye.Extensions
 {
     /// <summary>
     /// Exception formatting extension method.
@@ -11,10 +11,10 @@ namespace Hawkeye
         #region Exception
 
         /// <summary>
-        /// Returns Exception information intoa formatted string.
+        /// Returns Exception information into a formatted string.
         /// </summary>
         /// <param name="exception">The exception to describe.</param>
-        /// <returns>Formated (and indented) string giving information about <paramref name="exception"/>.</returns>
+        /// <returns>Formatted (and indented) string giving information about <paramref name="exception"/>.</returns>
         public static string ToFormattedString(this Exception exception)
         {
             if (exception == null) return string.Empty;
@@ -30,29 +30,34 @@ namespace Hawkeye
                 builder.Append(indent);
                 builder.Append(leafEx);
                 builder.Append("[");
-                builder.Append(currentException.GetType().ToString());
+                builder.Append(currentException.GetType());
                 builder.Append("] ");
                 builder.Append(currentException.Message);
                 builder.Append(Environment.NewLine);
 
                 indent += tab;
 
-                if (currentException.StackTrace == null)
-                    continue;
-
-                var stackTrace = currentException.StackTrace
-                    .Replace(Environment.NewLine, "\n").Split('\n');
-
-                for (int i = 0; i < stackTrace.Length; i++)
-                {
-                    builder.Append(indent);
-                    builder.Append(leafTr);
-                    builder.Append(stackTrace[i].Trim());
-                    builder.Append(Environment.NewLine);
-                }
+                AppendStackTrace(currentException, builder, indent, leafTr);
             }
 
             return builder.ToString();
+        }
+
+        private static void AppendStackTrace(Exception currentException, StringBuilder builder, string indent, string leafTr)
+        {
+            if (currentException.StackTrace == null)
+                return;
+
+            var stackTrace = currentException.StackTrace
+                .Replace(Environment.NewLine, "\n").Split('\n');
+
+            foreach (string trace in stackTrace)
+            {
+                builder.Append(indent);
+                builder.Append(leafTr);
+                builder.Append(trace.Trim());
+                builder.Append(Environment.NewLine);
+            }
         }
 
         #endregion

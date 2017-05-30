@@ -1,7 +1,7 @@
-﻿using Hawkeye.Logging;
-using Hawkeye.Configuration;
+﻿using Hawkeye.Configuration;
+using Hawkeye.Logging;
 
-namespace Hawkeye
+namespace Hawkeye.Extensions
 {
     /// <summary>
     /// Extennsions methods on <see cref="IHawkeyeHost"/>.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Hawkeye
+namespace Hawkeye.Extensions
 {
     /// <summary>
     /// Some useful DateTime-related extension methods.
@@ -10,7 +10,7 @@ namespace Hawkeye
     {
         #region DateTime
 
-        private static DateTime[] dayCache = null;
+        private static DateTime[] _dayCache;
 
         /// <summary>
         /// Converts the date to a short invariant string representation (format = &quot;yyyy/MM/dd&quot;).
@@ -72,7 +72,7 @@ namespace Hawkeye
         {
             return ToLongString(day, CultureInfo.CurrentUICulture);
         }
-        
+
         /// <summary>
         /// Formats the specified day as a long string.
         /// </summary>
@@ -88,18 +88,18 @@ namespace Hawkeye
 
         private static string ToFormattedString(this DayOfWeek day, string format, CultureInfo culture)
         {
-            if (dayCache == null)
+            if (_dayCache == null)
             {
-                dayCache = new DateTime[7];
-                int sundayIndex = 2; // January the 2nd 2000 was a Sunday.                
-                for (int i = 0; i < 7; i++)
+                _dayCache = new DateTime[7];
+                var sundayIndex = 2; // January the 2nd 2000 was a Sunday.
+                for (var i = 0; i < 7; i++)
                 {
-                    dayCache[i] = new DateTime(2000, 1, sundayIndex);
+                    _dayCache[i] = new DateTime(2000, 1, sundayIndex);
                     sundayIndex++;
                 }
             }
 
-            var dt = dayCache[(int)day];
+            var dt = _dayCache[(int)day];
             return dt.ToString(format, culture);
         }
 

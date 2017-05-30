@@ -6,6 +6,7 @@ using Hawkeye.Logging;
 using Hawkeye.Extensibility;
 using System.Drawing.Imaging;
 using System.IO;
+using Hawkeye.Extensions;
 
 namespace Hawkeye.CapturePlugin
 {

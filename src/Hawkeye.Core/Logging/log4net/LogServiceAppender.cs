@@ -70,7 +70,7 @@ namespace Hawkeye.Logging.log4net
             
             var entry = Log4NetHelper.LoggingEventToLogEntry(loggingEvent);
             if (Layout != null) entry.Formatter = new Log4NetLayoutFormatter(Layout);
-            logService.Log(entry);
+            logService.LogEntry(entry);
         }
 
         /// <summary>

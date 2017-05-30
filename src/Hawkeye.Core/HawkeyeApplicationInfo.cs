@@ -5,15 +5,15 @@ namespace Hawkeye
 {
     internal class HawkeyeApplicationInfo : IHawkeyeApplicationInfo
     {
-        private static readonly string hawkeyeDataDirectory;
+        private static readonly string HawkeyeDataDirectory;
 
         /// <summary>
         /// Initializes the <see cref="HawkeyeApplicationInfo" /> class.
         /// </summary>
         static HawkeyeApplicationInfo()
         {
-            hawkeyeDataDirectory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), 
+            HawkeyeDataDirectory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 "Hawkeye");
         }
 
@@ -22,7 +22,7 @@ namespace Hawkeye
         /// <summary>
         /// Gets the application data directory.
         /// </summary>
-        public string ApplicationDataDirectory => hawkeyeDataDirectory;
+        public string ApplicationDataDirectory => HawkeyeDataDirectory;
 
         #endregion
     }

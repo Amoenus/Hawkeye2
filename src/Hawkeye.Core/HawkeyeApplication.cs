@@ -5,7 +5,7 @@ namespace Hawkeye
     /// <summary>
     /// The root class representing the Hawkeye Application.
     /// </summary>
-    internal static partial class HawkeyeApplication
+    internal static class HawkeyeApplication
     {
         private static readonly HawkeyeApplicationInfo applicationInfo;
         private static readonly Bitness currentBitness;
@@ -17,7 +17,7 @@ namespace Hawkeye
         static HawkeyeApplication()
         {
             applicationInfo = new HawkeyeApplicationInfo();
-                        
+
             var clrVersion = typeof(int).Assembly.GetName().Version;
             currentClr = clrVersion.Major == 4 ? Clr.Net4 : Clr.Net2;
             currentBitness = IntPtr.Size == 8 ? Bitness.x64 : Bitness.x86;

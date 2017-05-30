@@ -45,16 +45,17 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Clr.cs" />
     <Compile Include="ComponentModel\ServiceNotFoundException.cs" />
     <Compile Include="Configuration\ISettingsStore.cs" />
-    <Compile Include="enums.cs" />
+    <Compile Include="Bitness.cs" />
     <Compile Include="Extensibility\BaseCommandPlugin.cs" />
     <Compile Include="Extensibility\BasePlugin.cs" />
     <Compile Include="Extensibility\ICommandPlugin.cs" />
-    <Compile Include="extensions\DateTimeExtensions.cs" />
-    <Compile Include="extensions\ExceptionExtensions.cs" />
-    <Compile Include="extensions\HostExtensions.cs" />
-    <Compile Include="extensions\ServiceExtensions.cs" />
+    <Compile Include="Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Extensions\ExceptionExtensions.cs" />
+    <Compile Include="Extensions\HostExtensions.cs" />
+    <Compile Include="Extensions\ServiceExtensions.cs" />
     <Compile Include="IHawkeyeApplicationInfo.cs" />
     <Compile Include="IHawkeyeHost.cs" />
     <Compile Include="Extensibility\IPlugin.cs" />

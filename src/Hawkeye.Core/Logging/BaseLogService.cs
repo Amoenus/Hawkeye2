@@ -20,7 +20,7 @@ namespace Hawkeye.Logging
         /// Logs the specified log entry.
         /// </summary>
         /// <param name="entry">The entry to log.</param>
-        public abstract void Log(ILogEntry entry);
+        public abstract void LogEntry(ILogEntry entry);
 
         /// <summary>
         /// Makes a <see cref="ILogEntry"/> object from the specified parameters.

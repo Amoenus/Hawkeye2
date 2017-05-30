@@ -49,7 +49,7 @@ namespace Hawkeye.Logging.log4net
         /// Logs the specified log entry.
         /// </summary>
         /// <param name="entry">The entry to log.</param>
-        public override void Log(ILogEntry entry)
+        public override void LogEntry(ILogEntry entry)
         {
             if (entry == null) throw new ArgumentNullException(nameof(entry));
 

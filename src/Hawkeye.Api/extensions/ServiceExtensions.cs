@@ -2,7 +2,7 @@
 using System.ComponentModel.Design;
 using Hawkeye.ComponentModel;
 
-namespace Hawkeye.extensions
+namespace Hawkeye.Extensions
 {
     /// <summary>
     /// Extension method allowing to use generic forms of <c>GetService</c> on <see cref="IServiceProvider"/> instances,

@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Security.Permissions;
 using System.Runtime.Serialization;
-using Hawkeye.extensions;
+using Hawkeye.Extensions;
 
 namespace Hawkeye.ComponentModel
 {

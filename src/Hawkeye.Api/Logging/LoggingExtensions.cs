@@ -40,7 +40,7 @@ namespace Hawkeye.Logging
         /// <param name="exception">The exception to trace.</param>
         public static void Log(this ILogService log, LogLevel level, string message, Exception exception)
         {
-            log.Log(log.MakeLogEntry(level, message, exception));
+            log.LogEntry(log.MakeLogEntry(level, message, exception));
         }
 
         #endregion

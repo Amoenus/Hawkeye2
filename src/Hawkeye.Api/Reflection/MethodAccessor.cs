@@ -5,18 +5,18 @@ namespace Hawkeye.Reflection
 {
     internal class MethodAccessor
     {
-        private static readonly BindingFlags[] flagsToExamine;
+        private static readonly BindingFlags[] FlagsToExamine;
 
-        private readonly string name;
-        private readonly Type targetType;
-        private readonly MethodInfo info;
+        private readonly string _name;
+        private readonly Type _targetType;
+        private readonly MethodInfo _info;
 
         /// <summary>
         /// Initializes the <see cref="MethodAccessor"/> class.
         /// </summary>
         static MethodAccessor()
         {
-            flagsToExamine = new[]
+            FlagsToExamine = new[]
             {
                 BindingFlags.NonPublic | BindingFlags.Instance,
                 BindingFlags.Public | BindingFlags.Instance,
@@ -31,36 +31,36 @@ namespace Hawkeye.Reflection
         /// <param name="methodName">Name of the method.</param>
         public MethodAccessor(Type methodTargetType, string methodName)
         {
-            name = methodName;
-            targetType = methodTargetType;
+            _name = methodName;
+            _targetType = methodTargetType;
 
             do
             {
-                foreach (var flagToExamine in flagsToExamine)
+                foreach (var flagToExamine in FlagsToExamine)
                 {
                     var candidate = FindMethod(flagToExamine);
                     if (candidate != null)
                     {
-                        info = candidate;
+                        _info = candidate;
                         break;
                     }
                 }
 
-                if (info == null)
+                if (_info == null)
                 {
-                    targetType = targetType.BaseType;
-                    if (targetType == typeof(object))
+                    _targetType = _targetType.BaseType;
+                    if (_targetType == typeof(object))
                         break;
                 }
 
-            } while (info == null);
+            } while (_info == null);
         }
 
-        public bool IsValid => info != null;
+        public bool IsValid => _info != null;
 
         public object Invoke(object target, object[] param)
         {
-            return info.Invoke(target, param);
+            return _info.Invoke(target, param);
         }
 
         public object Invoke(object target)
@@ -75,7 +75,7 @@ namespace Hawkeye.Reflection
 
         private MethodInfo FindMethod(BindingFlags flags)
         {
-            return targetType.GetMethod(name, flags);
+            return _targetType.GetMethod(_name, flags);
         }
     }
 }

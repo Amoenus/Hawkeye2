@@ -53,10 +53,9 @@ namespace Hawkeye
             return SettingsManager.GetStore(key);
         }
 
-        public IHawkeyeApplicationInfo ApplicationInfo { get; private set; }
+        public IHawkeyeApplicationInfo ApplicationInfo { get; }
 
-        public IWindowInfo CurrentWindowInfo => mainControl == null ?
-            null : mainControl.CurrentInfo;
+        public IWindowInfo CurrentWindowInfo => mainControl?.CurrentInfo;
 
         #endregion
 
@@ -241,7 +240,7 @@ namespace Hawkeye
 
         private void InitializeMainForm(IntPtr windowToSpy)
         {
-            if (mainForm != null) mainForm.Close();
+            mainForm?.Close();
             mainForm = new MainForm();
             if (windowToSpy != IntPtr.Zero)
                 mainForm.SetTarget(windowToSpy);
@@ -260,7 +259,7 @@ namespace Hawkeye
 
         private static string GetBootstrap(Clr clr, Bitness bitness)
         {
-            var bitnessVersion = string.Empty;
+            string bitnessVersion;
             switch (bitness)
             {
                 case Bitness.x86: bitnessVersion = "x86"; break;

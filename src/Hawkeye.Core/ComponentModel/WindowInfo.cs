@@ -98,8 +98,8 @@ namespace Hawkeye.ComponentModel
         public string ToShortString()
         {
             if (ControlInfo != null && ControlInfo.Control != null)
-                return string.Format("{0} - {1}", Handle, ControlInfo.Control.GetType());
-            else return string.Format("{0} - {1}", Handle, ClassName);
+                return $"{Handle} - {ControlInfo.Control.GetType()}";
+            else return $"{Handle} - {ClassName}";
         }
 
         #endregion
@@ -140,9 +140,8 @@ namespace Hawkeye.ComponentModel
             if (mscorlibsVersion.Any(v => v >= 2 && v < 4)) return Clr.Net2;
             
             // We have mscorlib assemblies, but we can't tell whether they are .NET 2 or 4; let's say they are unsupported.
-            log.Warning(string.Format("Unknown mscorlib versions:\r\n{0}", 
-                string.Join("----------------------------------------\r\n",
-                mscorlibs.Select(m => FileVersionInfo.GetVersionInfo(m.Path).ToString()).ToArray())));
+            log.Warning(
+                $"Unknown mscorlib versions:\r\n{string.Join("----------------------------------------\r\n", mscorlibs.Select(m => FileVersionInfo.GetVersionInfo(m.Path).ToString()).ToArray())}");
 
             return Clr.Unsupported;
         }

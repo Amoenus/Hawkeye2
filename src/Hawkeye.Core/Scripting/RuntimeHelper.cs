@@ -71,7 +71,7 @@ namespace Hawkeye.Scripting
 		private static void AddMember(ref List<string> list, int longestMemberCategory, MemberTypes memberType, bool isPrivate, string memberName)
 		{
 			string memberCategory = (memberType.ToString() + ":").PadRight(longestMemberCategory + 1, ' ');
-			list.Add(string.Format("[{0}] {1} {2}", isPrivate ? "-" : "+", memberCategory, memberName));
+			list.Add($"[{(isPrivate ? "-" : "+")}] {memberCategory} {memberName}");
 		}
 
 		private static string getMemberValueString(object value)
@@ -190,7 +190,7 @@ namespace Hawkeye.Scripting
 			//return string.Format("{0}(\"{1}\")", methodName, accessor);
 	
 			if (isAssignment && isLastAccessor)
-				return string.Format("{0}", GenerateReflectionWriteAccess(objectName, accessor, ref lines));
+				return $"{GenerateReflectionWriteAccess(objectName, accessor, ref lines)}";
 
 			return GenerateReflectionReadAccess(objectName, accessor, ref lines);
 		}
@@ -199,7 +199,7 @@ namespace Hawkeye.Scripting
 		{
 			string accessorWithQuotes = "\"" + accessor + "\"";
 
-			string notFoundMessage = string.Format("\"Could not resolve member \\\"{0}\\\"\"", accessor);
+			string notFoundMessage = $"\"Could not resolve member \\\"{accessor}\\\"\"";
 			return string.Format("GetType().GetProperty({2}) == null ? {0} : {1}.GetType().GetProperty({2}).SetValue({1}, %DYNAMIC_GET_EXPRESSION%)", notFoundMessage, objectName, accessorWithQuotes);
 		}
 
@@ -215,15 +215,17 @@ namespace Hawkeye.Scripting
 
 			string accessorWithQuotes = "\"" + accessor + "\"";
 
-			lines.Add(string.Format("System.Type {0} = {1}.GetType();", typeVar, objectName));
-			lines.Add(string.Format("System.Reflection.PropertyInfo {0} = {1}.GetProperty({2}, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);", propertyVar, typeVar, accessorWithQuotes));
-			lines.Add(string.Format("System.Reflection.MethodInfo {0} = {1}.GetMethod({2});", methodVar, typeVar, accessorWithQuotes));
-			lines.Add(string.Format("System.Reflection.FieldInfo {0} = {1}.GetField({2}, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);", fieldVar, typeVar, accessorWithQuotes));
+			lines.Add($"System.Type {typeVar} = {objectName}.GetType();");
+			lines.Add(
+			    $"System.Reflection.PropertyInfo {propertyVar} = {typeVar}.GetProperty({accessorWithQuotes}, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);");
+			lines.Add($"System.Reflection.MethodInfo {methodVar} = {typeVar}.GetMethod({accessorWithQuotes});");
+			lines.Add(
+			    $"System.Reflection.FieldInfo {fieldVar} = {typeVar}.GetField({accessorWithQuotes}, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);");
 
-			string notFoundMessage = string.Format("\"Could not resolve member \\\"{0}\\\"\"", accessor);
+			string notFoundMessage = $"\"Could not resolve member \\\"{accessor}\\\"\"";
 			//return string.Format("GetType().GetProperty({2}) == null ? {0} : {1}.GetType().GetProperty({2}).GetValue({1}, null)", notFoundMessage, objectName, "\"" + accessor + "\"");
 			string exp = string.Format("({0} != null ? {0}.GetValue({3}, null) : ({1} != null ? {1}.Invoke({3}, new System.Object[0]) : ({2} != null ? {2}.GetValue({3}) : null)));", propertyVar, methodVar, fieldVar, objectName);
-			lines.Add(string.Format("object {0} = {1}", resultVar, exp));
+			lines.Add($"object {resultVar} = {exp}");
 			return resultVar;
 		}
 

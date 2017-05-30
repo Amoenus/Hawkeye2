@@ -313,8 +313,7 @@ namespace Hawkeye
         private static void Log(LogLevel level, string message, int appId)
         {
             var log = LogManager.GetLogger<Shell>();
-            log.Log(level, appId == 0 ? message :
-                string.Format("{0} - {1}", appId.GetHashCode(), message));
+            log.Log(level, appId == 0 ? message : $"{appId.GetHashCode()} - {message}");
         }
 
         #endregion

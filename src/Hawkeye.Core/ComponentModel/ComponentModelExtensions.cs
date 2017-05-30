@@ -68,8 +68,7 @@ namespace Hawkeye.ComponentModel
                 }
                 catch (Exception ex)
                 {
-                    log.Error(string.Format(
-                        "Could not convert a property info into a property descriptor: {0}", ex.Message), ex);
+                    log.Error($"Could not convert a property info into a property descriptor: {ex.Message}", ex);
                 }
             };
 
@@ -125,8 +124,7 @@ namespace Hawkeye.ComponentModel
                 }
                 catch (Exception ex)
                 {
-                    log.Error(string.Format(
-                        "Could not convert an event info into a property descriptor: {0}", ex.Message), ex);
+                    log.Error($"Could not convert an event info into a property descriptor: {ex.Message}", ex);
                 }
             };
 

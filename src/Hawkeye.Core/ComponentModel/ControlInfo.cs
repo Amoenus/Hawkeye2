@@ -85,8 +85,8 @@ namespace Hawkeye.ComponentModel
                 // But in some cases (when inspecting most Visual Studio controls for instance), it is not...
                 // Is there a workaround? It seems that only the VS property grid & the windows forms designer
                 // can be inpected
-                log.Warning(string.Format(
-                    "Handle {0} is not associated with a .NET control: 'Control.FromHandle(hwnd)' returns null.", hwnd));
+                log.Warning(
+                    $"Handle {hwnd} is not associated with a .NET control: 'Control.FromHandle(hwnd)' returns null.");
             }
 
             return control;

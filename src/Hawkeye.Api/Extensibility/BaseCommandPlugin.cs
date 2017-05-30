@@ -60,7 +60,7 @@ namespace Hawkeye.Extensibility
             }
             catch (Exception ex)
             {
-                log.Error(string.Format("Could not determine whether command can be executed: {0}", ex.Message), ex);
+                log.Error($"Could not determine whether command can be executed: {ex.Message}", ex);
                 return false;
             }
         }

@@ -152,8 +152,7 @@ namespace Hawkeye.Configuration
                 }
                 catch (Exception ex)
                 {
-                    log.Error(string.Format(
-                        "Unable to deserialize layout information for key {0}.", key), ex);
+                    log.Error($"Unable to deserialize layout information for key {key}.", ex);
                 }
             }
         }
@@ -177,17 +176,13 @@ namespace Hawkeye.Configuration
                             }
                             catch (Exception ex)
                             {
-                                log.Warning(string.Format(
-                                    "Invalid 'bounds' value for key {0}: {1}",
-                                    key, bounds), ex);
+                                log.Warning($"Invalid 'bounds' value for key {key}: {bounds}", ex);
                                 layoutData.Bounds = null;
                             }
                         }
                         else
                         {
-                            log.Warning(string.Format(
-                                "'bounds' value for key {0} was not found.",
-                                key));
+                            log.Warning($"'bounds' value for key {key} was not found.");
                             layoutData.Bounds = null;
                         }
                         break;
@@ -209,9 +204,7 @@ namespace Hawkeye.Configuration
                         }
                         else
                         {
-                            log.Warning(string.Format(
-                                "'state' value for key {0} was not found.",
-                                key));
+                            log.Warning($"'state' value for key {key} was not found.");
                             layoutData.WindowState = null;
                         }
                         break;
@@ -385,7 +378,7 @@ namespace Hawkeye.Configuration
                             SetDefaultLayout(form);
                         else form.Bounds = bounds;
                     }
-                    else log.Verbose(string.Format("Could not find a 'bounds' value for layout key {0}", key));
+                    else log.Verbose($"Could not find a 'bounds' value for layout key {key}");
 
                     if (layout.WindowState.HasValue)
                     {
@@ -398,7 +391,7 @@ namespace Hawkeye.Configuration
                     {
                         // default to Normal
                         form.WindowState = FormWindowState.Normal;
-                        log.Verbose(string.Format("Could not find a 'state' value for layout key {0}", key));
+                        log.Verbose($"Could not find a 'state' value for layout key {key}");
                     }
 
                     // If state is Normal and we have no bounds, use DefaultBounds and center on screen
@@ -504,9 +497,7 @@ namespace Hawkeye.Configuration
                     try { return converter.ConvertFrom(null, CultureInfo.InvariantCulture, value); }
                     catch (Exception ex)
                     {
-                        log.Verbose(string.Format(
-                            "Unable to convert {0} to a {1} using invariant culture.",
-                            value, targetType), ex);
+                        log.Verbose($"Unable to convert {value} to a {targetType} using invariant culture.", ex);
 
                         // Then, second chance: we use the current culture.
                         return converter.ConvertFrom(null, Thread.CurrentThread.CurrentCulture, value);

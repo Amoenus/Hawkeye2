@@ -33,10 +33,7 @@ namespace Hawkeye.DemoProject
 #endif
             exitButton.Click += delegate { Close(); };
             exitButton.Text += " " + exitButton.Handle;
-            base.Text = string.Format("Test: {0} bits; HWND={1} - .NET {2}", 
-                8 * Marshal.SizeOf(typeof(IntPtr)),
-                Handle,
-                fx);
+            base.Text = $"Test: {8 * Marshal.SizeOf(typeof(IntPtr))} bits; HWND={Handle} - .NET {fx}";
         }
 
         /// <summary>

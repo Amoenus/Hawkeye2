@@ -33,9 +33,7 @@ namespace HawkeyeBootstrap
         private static void Main(string[] args)
         {
             var log = SimpleLogManager.GetLogger(typeof(Program), "Main");
-            log.Info(string.Format("Command line: {0} {1}",
-                Process.GetCurrentProcess().ProcessName,
-                string.Join(" ", args)));
+            log.Info($"Command line: {Process.GetCurrentProcess().ProcessName} {string.Join(" ", args)}");
 
             InjectorParameters parameters = null;
             try
@@ -44,8 +42,7 @@ namespace HawkeyeBootstrap
             }
             catch (Exception ex)
             {
-                log.Error(string.Format(
-                    "Wrong command-line arguments: {0}.\r\n{1}", ex.Message, ex));
+                log.Error($"Wrong command-line arguments: {ex.Message}.\r\n{ex}");
                 return;
             }
 
@@ -65,8 +62,7 @@ namespace HawkeyeBootstrap
             }
             catch (Exception ex)
             {
-                log.Error(string.Format(
-                    "There was an error during the injection process: {0}.\r\n{1}", ex.Message, ex));
+                log.Error($"There was an error during the injection process: {ex.Message}.\r\n{ex}");
                 return;
             }
 
@@ -80,14 +76,14 @@ namespace HawkeyeBootstrap
             GetWindowThreadProcessId(windowHandle, out processId);
             if (processId == IntPtr.Zero)
             {
-                log.Error(string.Format("could not get process for window handle {0}", windowHandle));
+                log.Error($"could not get process for window handle {windowHandle}");
                 return null;
             }
 
             var process = Process.GetProcessById(processId.ToInt32());
             if (process == null)
             {
-                log.Error(string.Format("could not get process for PID = {0}", processId));
+                log.Error($"could not get process for PID = {processId}");
                 return null;
             }
             return process;
@@ -108,10 +104,9 @@ namespace HawkeyeBootstrap
                 }
             }
 
-            if (containsFile) log.Info(string.Format(
-                "Successfully injected Hawkeye for process {0} (PID = {1})", process.ProcessName, process.Id));
-            else log.Error(string.Format(
-                "Failed to inject for process {0} (PID = {1})", process.ProcessName, process.Id));
+            if (containsFile) log.Info(
+                $"Successfully injected Hawkeye for process {process.ProcessName} (PID = {process.Id})");
+            else log.Error($"Failed to inject for process {process.ProcessName} (PID = {process.Id})");
 
             return containsFile;
         }

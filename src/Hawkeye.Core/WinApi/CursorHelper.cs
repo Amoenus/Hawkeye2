@@ -24,8 +24,8 @@ namespace Hawkeye.WinApi
         public static Cursor LoadFrom(string path)
         {
             var handle = NativeMethods.LoadCursorFromFile(path);
-            if (handle == IntPtr.Zero) throw new Win32Exception(string.Format(
-                "Invalid Cursor handle; could not load cursor from {0}", path));
+            if (handle == IntPtr.Zero) throw new Win32Exception(
+                $"Invalid Cursor handle; could not load cursor from {path}");
 
             var cursor = new Cursor(handle);
 

@@ -42,7 +42,7 @@ namespace Hawkeye.Extensibility
 
             if (!Directory.Exists(directory))
             {
-                log.Debug(string.Format("No Plugins directory ({0}).", directory));
+                log.Debug($"No Plugins directory ({directory}).");
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace Hawkeye.Extensibility
 
             foreach (var file in Directory.GetFiles(directory, "*.dll"))
             {
-                log.Debug(string.Format("Examining File {0} for plugins:", file));
+                log.Debug($"Examining File {file} for plugins:");
                 try
                 {
                     var assy = Assembly.LoadFile(file);
@@ -60,7 +60,7 @@ namespace Hawkeye.Extensibility
                         log.Debug("--> No plugins in this assembly");
                     else
                     {
-                        log.Debug(string.Format("--> {0} plugins were found in this assembly", types.Length));
+                        log.Debug($"--> {types.Length} plugins were found in this assembly");
                         foreach (var type in types)
                         {
                             try
@@ -70,14 +70,14 @@ namespace Hawkeye.Extensibility
                             }
                             catch (Exception ex)
                             {
-                                log.Error(string.Format("----> Could not create an instance of type {0}: {1}", type, ex.Message), ex);
+                                log.Error($"----> Could not create an instance of type {type}: {ex.Message}", ex);
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    log.Debug(string.Format("--> Not an assembly: {0}", ex.Message));
+                    log.Debug($"--> Not an assembly: {ex.Message}");
                 }
             }
 
@@ -99,7 +99,7 @@ namespace Hawkeye.Extensibility
                 try
                 {
                     pluginName = descriptor.Name;
-                    log.Debug(string.Format("Loading plugin '{0}':", pluginName));
+                    log.Debug($"Loading plugin '{pluginName}':");
                     var instance = descriptor.Create(host);
                     if (instance == null)
                         log.Warning("--> Created plugin is null. Nothing to load.");
@@ -111,7 +111,7 @@ namespace Hawkeye.Extensibility
                 }
                 catch (Exception ex)
                 {
-                    log.Error(string.Format("--> Plugin '{0}' could not be loaded: {1}", pluginName, ex.Message), ex);
+                    log.Error($"--> Plugin '{pluginName}' could not be loaded: {ex.Message}", ex);
                 }
             }
 

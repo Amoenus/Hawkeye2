@@ -97,7 +97,7 @@ namespace Hawkeye
             var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
             var ci = type.GetConstructor(flags, null, Type.EmptyTypes, null);
-            if (ci == null) throw new InvalidOperationException(string.Format("Type {0} must define a parameterless constructor.", type));
+            if (ci == null) throw new InvalidOperationException($"Type {type} must define a parameterless constructor.");
             return ci.Invoke(null);
         }
 

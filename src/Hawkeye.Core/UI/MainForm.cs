@@ -130,10 +130,10 @@ namespace Hawkeye.UI
             var bitness = HawkeyeApplication.CurrentBitness.ToString().ToLowerInvariant();
             var clrAndBitness = string.IsNullOrEmpty(clr) ? bitness : clr + " " + bitness;
 
-            var title = string.Format("Hawkeye {0}", clrAndBitness);
+            var title = $"Hawkeye {clrAndBitness}";
             if (string.IsNullOrEmpty(controlName))
                 base.Text = title;
-            else base.Text = string.Format("{0} - {1}", controlName, title);
+            else base.Text = $"{controlName} - {title}";
         }
 
         private void SetWindowSettings(MainFormSettings settings)

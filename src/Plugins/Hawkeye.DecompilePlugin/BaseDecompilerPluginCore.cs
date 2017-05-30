@@ -58,7 +58,7 @@ Make sure it is running";
             windowInfo = base.Host.CurrentWindowInfo;
             base.RaiseCanExecuteChanged(this);
 
-            log.Info(string.Format("'{0}' was initialized.", base.Descriptor.Name));
+            log.Info($"'{base.Descriptor.Name}' was initialized.");
         }
 
         /// <summary>

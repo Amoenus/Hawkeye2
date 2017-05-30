@@ -59,7 +59,7 @@ namespace FxDetector
             {
                 long windowHandle;
                 if (!long.TryParse(hwndBox.Text, out windowHandle)) MessageBox.Show(
-                    this, string.Format("{0} is not a valid window handle.", hwndBox.Text), "Error",
+                    this, $"{hwndBox.Text} is not a valid window handle.", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else hwnd = new IntPtr(windowHandle);
             }
@@ -67,7 +67,7 @@ namespace FxDetector
             {
                 int windowHandle;
                 if (!int.TryParse(hwndBox.Text, out windowHandle)) MessageBox.Show(
-                    this, string.Format("{0} is not a valid window handle.", hwndBox.Text), "Error",
+                    this, $"{hwndBox.Text} is not a valid window handle.", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else hwnd = new IntPtr(windowHandle);
             }

@@ -77,7 +77,7 @@ namespace Hawkeye.Configuration
                     {
                         var prefix = node.Name;
                         foreach (var subnode in node.ChildNodes.Cast<XmlNode>())
-                            LoadSettings(subnode, string.Format("{0}/{1}", prefix, subnode.Name));
+                            LoadSettings(subnode, $"{prefix}/{subnode.Name}");
                     }
                 }
             }
@@ -120,8 +120,7 @@ namespace Hawkeye.Configuration
                     }
                     catch (Exception ex)
                     {
-                        log.Error(string.Format(
-                            "Could not createb backup copy of settings file: {0}", ex.Message), ex);
+                        log.Error($"Could not createb backup copy of settings file: {ex.Message}", ex);
                     }
                 }
             }

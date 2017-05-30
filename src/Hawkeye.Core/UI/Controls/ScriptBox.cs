@@ -152,7 +152,8 @@ namespace Hawkeye.UI.Controls
 
 			if (info != null && info.Control != null)
 			{
-				string controlInjectorLine = String.Format("System.Windows.Forms.Control _target = System.Windows.Forms.Control.FromHandle((IntPtr){0});", _controlInfo.Control.Handle);
+				string controlInjectorLine =
+				    $"System.Windows.Forms.Control _target = System.Windows.Forms.Control.FromHandle((IntPtr){_controlInfo.Control.Handle});";
 
 				lines = new string[6];
 				lines[0] = "// These lines were injected dynamically to script against the target object with the variable [_target].";

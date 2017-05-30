@@ -134,7 +134,7 @@
     </Compile>
     <Compile Include="UI\events.cs" />
     <Compile Include="UI\enumerations.cs" />
-    <Compile Include="UI\GenericComponentEditor.cs" />
+    <Compile Include="UI\PropertyTabs\GenericComponentEditor.cs" />
     <Compile Include="UI\GenericComponentEditorPage.cs">
       <SubType>Component</SubType>
     </Compile>

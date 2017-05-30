@@ -7,7 +7,6 @@ using System.ComponentModel;
 using Hawkeye.WinApi;
 using Hawkeye.Logging;
 using Hawkeye.ComponentModel;
-using Hawkeye.UI.Controls;
 
 namespace Hawkeye.UI
 {
@@ -27,7 +26,7 @@ namespace Hawkeye.UI
         public MainControl()
         {
             InitializeComponent();
-            
+
             // Remove the .NET Tab (to hide it)
             tabs.SuspendLayout();
             tabs.TabPages.Remove(dotNetTabPage);
@@ -64,9 +63,9 @@ namespace Hawkeye.UI
         }
 
         /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.UserControl.Load"/> event.
+        /// Raises the <see cref="E:System.Windows.Forms.UserControl.Load" /> event.
         /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        /// <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -103,7 +102,7 @@ namespace Hawkeye.UI
 
             hwndBox.Text = CurrentInfo.ToShortString();
 
-            // Inject ourself if possible
+            // Inject our self if possible
             if (HawkeyeApplication.CanInject(CurrentInfo))
             {
                 HawkeyeApplication.Inject(CurrentInfo);
@@ -138,8 +137,7 @@ namespace Hawkeye.UI
             // Update the hwnd box in case we detected .NET properties.
             hwndBox.Text = CurrentInfo.ToShortString();
 
-            if (CurrentInfoChanged != null)
-                CurrentInfoChanged(this, EventArgs.Empty);
+            CurrentInfoChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void FillControlInfo(IControlInfo controlInfo)
@@ -177,14 +175,11 @@ namespace Hawkeye.UI
         {
             switch (action)
             {
-                case DotNetPropertyGridAction.Previous: return history.HasPrevious;                    
+                case DotNetPropertyGridAction.Previous: return history.HasPrevious;
                 case DotNetPropertyGridAction.Next: return history.HasNext;
                 case DotNetPropertyGridAction.Parent:
-                    return 
-                        CurrentInfo != null &&
-                        CurrentInfo.ControlInfo != null &&
-                        CurrentInfo.ControlInfo.Control != null &&
-                        CurrentInfo.ControlInfo.Control.Parent != null;
+                    return
+                        CurrentInfo?.ControlInfo?.Control?.Parent != null;
                 case DotNetPropertyGridAction.Highlight:
                     return Target != IntPtr.Zero;
             }
@@ -197,7 +192,7 @@ namespace Hawkeye.UI
             foreach (var action in Enum.GetValues(typeof(DotNetPropertyGridAction)).Cast<DotNetPropertyGridAction>())
                 dotNetPropertyGrid.EnableAction(action, CanExecuteAction(action));
         }
-        
+
         #endregion
 
         private void BuildCurrentWindowInfo(IntPtr hwnd)
@@ -214,8 +209,7 @@ namespace Hawkeye.UI
                 }
                 catch (Exception ex)
                 {
-                    log.Error(string.Format(
-                        "Error while building window info: {0}", ex.Message), ex);
+                    log.Error($"Error while building window info: {ex.Message}", ex);
                 }
 
                 CurrentInfo = info;
@@ -252,7 +246,7 @@ namespace Hawkeye.UI
             }
             catch (Exception ex)
             {
-                var message = string.Format("Could not create dump file for handle {0}: {1}", CurrentInfo.Handle, ex.Message);
+                var message = $"Could not create dump file for handle {CurrentInfo.Handle}: {ex.Message}";
                 log.Error(message, ex);
                 ErrorBox.Show(this, message);
             }
@@ -266,14 +260,11 @@ namespace Hawkeye.UI
         {
             using (var dialog = new SaveFileDialog()
             {
-                //FileName = string.Format("dump_{0}.log", CurrentInfo.Hwnd),
                 FileName = "dump.log",
-                Filter = "Log files|*.log|All files|*.*"
+                Filter = @"Log files|*.log|All files|*.*"
             })
             {
-                if (dialog.ShowDialog(this) == DialogResult.OK)
-                    return dialog.FileName;
-                else return string.Empty;
+                return dialog.ShowDialog(this) == DialogResult.OK ? dialog.FileName : string.Empty;
             }
         }
 

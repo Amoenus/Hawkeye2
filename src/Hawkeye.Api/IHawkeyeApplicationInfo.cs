@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Hawkeye
+﻿namespace Hawkeye
 {
     /// <summary>
     /// Stores various information relative to the Hawkeye application

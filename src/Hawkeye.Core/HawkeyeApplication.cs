@@ -7,20 +7,18 @@ namespace Hawkeye
     /// </summary>
     internal static class HawkeyeApplication
     {
-        private static readonly HawkeyeApplicationInfo applicationInfo;
-        private static readonly Bitness currentBitness;
-        private static readonly Clr currentClr;
+        private static readonly HawkeyeApplicationInfo ApplicationInfo;
 
         /// <summary>
         /// Initializes the <see cref="HawkeyeApplication"/> class.
         /// </summary>
         static HawkeyeApplication()
         {
-            applicationInfo = new HawkeyeApplicationInfo();
+            ApplicationInfo = new HawkeyeApplicationInfo();
 
             var clrVersion = typeof(int).Assembly.GetName().Version;
-            currentClr = clrVersion.Major == 4 ? Clr.Net4 : Clr.Net2;
-            currentBitness = IntPtr.Size == 8 ? Bitness.x64 : Bitness.x86;
+            CurrentClr = clrVersion.Major == 4 ? Clr.Net4 : Clr.Net2;
+            CurrentBitness = IntPtr.Size == 8 ? Bitness.x64 : Bitness.x86;
 
             Shell = new Shell();
         }
@@ -33,12 +31,12 @@ namespace Hawkeye
         /// <summary>
         /// Gets Hawkeye current CLR.
         /// </summary>
-        public static Clr CurrentClr => currentClr;
+        public static Clr CurrentClr { get; }
 
         /// <summary>
         /// Gets Hawkeye current bitness.
         /// </summary>
-        public static Bitness CurrentBitness => currentBitness;
+        public static Bitness CurrentBitness { get; }
 
         /// <summary>
         /// Runs the Hawkeye application.

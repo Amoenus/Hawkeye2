@@ -19,6 +19,6 @@ namespace Hawkeye.UI
         public Size Size { get; set; }
         public Point Location { get; set; }
         public FormWindowState WindowState { get; set; }
-        public Screen Screen { get; set; } 
+        public Screen Screen { get; set; }
     }
 }

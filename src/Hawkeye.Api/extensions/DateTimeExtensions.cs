@@ -19,7 +19,7 @@ namespace Hawkeye.Extensions
         /// <returns>The converted string representation.</returns>
         public static string ToShortInvariantString(this DateTime dateTime)
         {
-            return dateTime.ToString("yyyy/MM/dd");
+            return dateTime.ToString(@"yyyy/MM/dd");
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Hawkeye.Extensions
         /// <returns>The converted string representation.</returns>
         public static string ToLongInvariantString(this DateTime dateTime)
         {
-            return dateTime.ToString("yyyy/MM/dd HH:mm:ss");
+            return dateTime.ToString(@"yyyy/MM/dd HH:mm:ss");
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Hawkeye.Extensions
         /// <returns>A string representation of the specified date.</returns>
         public static string ToVeryLongInvariantString(this DateTime dateTime)
         {
-            return dateTime.ToString("yyyy/MM/dd HH:mm:ss.FFFFFFF");
+            return dateTime.ToString(@"yyyy/MM/dd HH:mm:ss.FFFFFFF");
         }
 
         /// <summary>

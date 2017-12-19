@@ -4,14 +4,14 @@ using System.Text;
 namespace Hawkeye.Extensions
 {
     /// <summary>
-    /// Exception formatting extension method.
+    /// <see cref="Exception"/> formatting extension method.
     /// </summary>
     public static class ExceptionExtensions
     {
         #region Exception
 
         /// <summary>
-        /// Returns Exception information into a formatted string.
+        /// Returns <see cref="Exception"/> information into a formatted string.
         /// </summary>
         /// <param name="exception">The exception to describe.</param>
         /// <returns>Formatted (and indented) string giving information about <paramref name="exception"/>.</returns>

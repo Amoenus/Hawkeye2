@@ -11,7 +11,7 @@ namespace Hawkeye
         /// Gets the Windows Forms Control.
         /// </summary>
 #if DEBUG
-        Control Control { get; set; } // needed for tests purpose
+        Control Control { get; set; } // needed for test purposes
 #else
         Control Control { get; }
 #endif

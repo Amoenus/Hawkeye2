@@ -16,7 +16,7 @@ namespace Hawkeye.Configuration
             private const string ImplementationVersion = "1.0.0";
 
             private static readonly ILogService Log = LogManager.GetLogger<SettingsManagerImplementation>();
-            
+
             private Dictionary<string, SettingsStore> _stores = new Dictionary<string, SettingsStore>();
             private XmlDocument _settingsDocument = null;
 
@@ -62,7 +62,7 @@ namespace Hawkeye.Configuration
                 }
 
                 var children = rootNode.ChildNodes.Cast<XmlNode>();
-                if (children.Count() == 0)
+                if (!children.Any())
                 {
                     // Add Hawkeye node
                     rootNode.AppendChild(_settingsDocument.CreateElement(HawkeyeStoreKey));
@@ -85,7 +85,7 @@ namespace Hawkeye.Configuration
             private void LoadHawkeyeSettings(XmlNode node)
             {
                 var children = node.ChildNodes.Cast<XmlNode>();
-                if (children.Count() == 0) return;
+                if (!children.Any()) return;
 
                 var configurationNode = children.SingleOrDefault(n => n.Name == "configuration");
                 if (configurationNode != null) LoadSettings(configurationNode, HawkeyeStoreKey);
@@ -120,7 +120,7 @@ namespace Hawkeye.Configuration
                     }
                     catch (Exception ex)
                     {
-                        Log.Error($"Could not createb backup copy of settings file: {ex.Message}", ex);
+                        Log.Error($"Could not create backup copy of settings file: {ex.Message}", ex);
                     }
                 }
             }

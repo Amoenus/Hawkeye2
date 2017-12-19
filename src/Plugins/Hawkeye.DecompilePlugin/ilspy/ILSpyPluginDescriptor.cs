@@ -1,5 +1,4 @@
 ﻿using System;
-using Hawkeye.DecompilePlugin.ilspy;
 using Hawkeye.Extensibility;
 
 namespace Hawkeye.DecompilePlugin.IlSpy

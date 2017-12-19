@@ -15,7 +15,7 @@ namespace Hawkeye.Logging
         protected abstract Type SourceType { get; }
 
         #region ILogService Members
-        
+
         /// <summary>
         /// Logs the specified log entry.
         /// </summary>

@@ -14,14 +14,14 @@
 //            public IHawkeyeEditor Editor { get; set; }
 
 //            public IReflectionApi ReflectionApi { get; set; }
-            
+
 //            #endregion
 //        }
 
 //        private class ReflectionApi : IReflectionApi
 //        {
 //            #region IReflectionApi Members
-                                    
+
 //            public IFieldAccessor CreateFieldAccessor(object targetObject, string fieldName)
 //            {
 //                return new FieldAccessor(targetObject, fieldName);
@@ -39,7 +39,7 @@
 
 //            #endregion
 //        }
-        
+
 //        public static IHawkeyeApi CreateHawkeyeApi()
 //        {
 //            return new HawkeyeApi()

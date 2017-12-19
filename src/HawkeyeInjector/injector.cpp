@@ -33,13 +33,13 @@ __declspec(dllexport)
 {
 	LRESULT result;
 	try
-	{	
+	{
 		if (code == HC_ACTION)
 		{
 			CWPSTRUCT* msg = (CWPSTRUCT*)lparam;
 			if (msg != NULL && msg->message == WM_GOBABYGO)
 			{
-				SimpleLogService^ log = SimpleLogManager::GetLogger(Injector::typeid, "MessageHookProc");	
+				SimpleLogService^ log = SimpleLogManager::GetLogger(Injector::typeid, "MessageHookProc");
 				log->Debug("Got WM_GOBABYGO message");
 
 				wchar_t* acmRemote = (wchar_t*)msg->wParam;
@@ -57,37 +57,37 @@ __declspec(dllexport)
 					Type^ type = assembly->GetType(parameters->ClassName);
 					if(type != nullptr)
 					{
-						log->Debug(String::Format("Just loaded the type {0}; now looking for method {1}", 
+						log->Debug(String::Format("Just loaded the type {0}; now looking for method {1}",
 							parameters->ClassName, parameters->MethodName));
-						System::Reflection::BindingFlags flags = 
-							System::Reflection::BindingFlags::Static | 
-							System::Reflection::BindingFlags::Public | 
+						System::Reflection::BindingFlags flags =
+							System::Reflection::BindingFlags::Static |
+							System::Reflection::BindingFlags::Public |
 							System::Reflection::BindingFlags::NonPublic;
 						MethodInfo^ methodInfo = type->GetMethod(parameters->MethodName, flags);
 						if(methodInfo != nullptr)
 						{
-							log->Debug(String::Format("About to invoke {0}.{1}", 
+							log->Debug(String::Format("About to invoke {0}.{1}",
 								parameters->ClassName, parameters->MethodName));
 							try
 							{
-								Object^ returnValue = methodInfo->Invoke(nullptr, gcnew array<Object^>(2) 
-								{ 
-									parameters->WindowHandle, parameters->OriginalHandle 
+								Object^ returnValue = methodInfo->Invoke(nullptr, gcnew array<Object^>(2)
+								{
+									parameters->WindowHandle, parameters->OriginalHandle
 								});
-								log->Debug(String::Format("Return value of {0} on type {1} is: {2}", 
-									methodInfo->Name, parameters->ClassName, 
+								log->Debug(String::Format("Return value of {0} on type {1} is: {2}",
+									methodInfo->Name, parameters->ClassName,
 									returnValue == nullptr ? "null" : returnValue->ToString()));
 							}
 							catch (Exception^ ex)
 							{
-								log->Error(String::Format("Could not invoke {0}.{1}: {2}\r\n{3}", 
+								log->Error(String::Format("Could not invoke {0}.{1}: {2}\r\n{3}",
 									parameters->ClassName, parameters->MethodName, ex->Message, ex));
 							}
 						}
-						else log->Error(String::Format("Could not find method {0} in type {1}", 
+						else log->Error(String::Format("Could not find method {0} in type {1}",
 							parameters->MethodName, parameters->ClassName));
 					}
-					else log->Error(String::Format("Could not find type {0} in assembly {1}", 
+					else log->Error(String::Format("Could not find type {0} in assembly {1}",
 						parameters->ClassName, parameters->AssemblyName));
 				}
 				else log->Error(String::Format("Could not load assembly from {0}", parameters->AssemblyName));
@@ -153,13 +153,13 @@ namespace HawkeyeInjector
 
 	array<String^>^ InjectorParameters::ToStringArray()
 	{
-		return gcnew array<String^>(5)		
-		{ 
-			WindowHandle.ToString(), OriginalHandle.ToString(), 
-				AssemblyName, ClassName, MethodName 
+		return gcnew array<String^>(5)
+		{
+			WindowHandle.ToString(), OriginalHandle.ToString(),
+				AssemblyName, ClassName, MethodName
 		};
 	}
-	
+
 
 	//-----------------------------------------------------------------------------
 	//Spying Process functions follow
@@ -237,7 +237,7 @@ namespace HawkeyeInjector
 					log->Debug("FreeLibrary succeeded.");
 				else LogLastError(log, "FreeLibrary failed.");
 			}
-			else LogLastError(log, "GetModuleHandleEx failed.");			
+			else LogLastError(log, "GetModuleHandleEx failed.");
 		}
 		catch (Exception^ ex)
 		{
@@ -247,7 +247,7 @@ namespace HawkeyeInjector
 
 	void Injector::LogLastError(SimpleLogService^ log, String^ message)
 	{
-		DWORD error = ::GetLastError(); 
+		DWORD error = ::GetLastError();
 		wchar_t buffer[256];
 		::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, error, 0, buffer, 256, nullptr);
 		log->Error(message + String::Format(" - Win32: {0} - {1}", error, msclr::interop::marshal_as<String^>(buffer)));

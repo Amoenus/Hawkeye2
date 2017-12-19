@@ -17,6 +17,7 @@ namespace HawkeyeApplication
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Force American English
+
             Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en-US");
 
             if (args.Length == 0)

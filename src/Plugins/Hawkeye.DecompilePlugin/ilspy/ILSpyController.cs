@@ -4,7 +4,7 @@ namespace Hawkeye.DecompilePlugin
 {
     // Based on information found here: https://github.com/icsharpcode/ILSpy/blob/master/doc/Command%20Line.txt:
     // ILSpy Command Line Arguments
-    // 
+    //
     // Command line arguments can be either options or file names.
     // If an argument is a file name, the file will be opened as assembly and added to the current assembly list.
     //
@@ -12,30 +12,30 @@ namespace Hawkeye.DecompilePlugin
     //     /singleInstance    If ILSpy is already running, activates the existing instance
     //                        and passes command line arguments to that instance.
     //                        This is the default value if /list is not used.
-    //     
+    //
     //     /separate          Start up a separate ILSpy instance even if it is already running.
-    //     
+    //
     //     /noActivate        Do not activate the existing ILSpy instance. This option has no effect
     //                        if a new ILSpy instance is being started.
-    //     
+    //
     //     /list:listname     Specifies the name of the assembly list that is loaded initially.
     //                        When this option is not specified, ILSpy loads the previously opened list.
     //                        Specify "/list" (without value) to open the default list.
-    //                        
+    //
     //                        When this option is used, ILSpy will activate an existing instance
     //                        only if it uses the same list as specified.
-    //                        
+    //
     //                        [Note: Assembly Lists are not yet implemented]
-    //     
+    //
     //     /clearList         Clears the assembly list before loading the specified assemblies.
     //                        [Note: Assembly Lists are not yet implemented]
-    //     
+    //
     //     /navigateTo:tag    Navigates to the member specified by the given ID string.
     //                        The member is searched for only in the assemblies specified on the command line.
     //                        Example: 'ILSpy ILSpy.exe /navigateTo:T:ICSharpCode.ILSpy.CommandLineArguments'
-    //                        
+    //
     //                        The syntax of ID strings is described in appendix A of the C# language specification.
-    //     
+    //
     //     /language:name     Selects the specified language.
     //                        Example: 'ILSpy /language:C#' or 'ILSpy /language:IL'
     //

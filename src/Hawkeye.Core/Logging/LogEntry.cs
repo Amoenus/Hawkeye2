@@ -12,7 +12,7 @@ namespace Hawkeye.Logging
         private class DefaultFormatter : ILogEntryFormatter
         {
             public static readonly DefaultFormatter instance = new DefaultFormatter();
-            
+
             #region ILogEntryFormatter Members
 
             public string FormatEntry(LogEntry entry)
@@ -54,10 +54,10 @@ namespace Hawkeye.Logging
         /// <summary>
         /// Initializes a new instance of the <see cref="ILogEntry"/> class.
         /// </summary>
-        public LogEntry() 
+        public LogEntry()
         {
             TimeStamp = DateTime.Now;
-            Formatter = DefaultFormatter.instance; 
+            Formatter = DefaultFormatter.instance;
         }
 
         /// <summary>

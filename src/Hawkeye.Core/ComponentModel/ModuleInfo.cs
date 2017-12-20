@@ -31,42 +31,57 @@ namespace Hawkeye.ComponentModel
         }
 
         #region IModuleInfo Members
-        
-        /// <summary>
-        /// Gets the identifier of the process who owns this module.
-        /// </summary>
+
+        /// <inheritdoc />
         public uint ProcessId { get; private set; }
 
-        /// <summary>
-        /// Gets the base address of the module in the context of the owning process.
-        /// </summary>
+        /// <inheritdoc />
         public IntPtr BaseAddress { get; private set; }
 
-        /// <summary>
-        /// Gets the size of the module, in bytes.
-        /// </summary>
+        /// <inheritdoc />
         public uint BaseSize { get; private set; }
 
-        /// <summary>
-        /// Gets a handle to the module in the context of the owning process.
-        /// </summary>
+        /// <inheritdoc />
         public IntPtr Handle { get; private set; }
 
-        /// <summary>
-        /// Gets the module name.
-        /// </summary>
+        /// <inheritdoc />
         public string Name { get; private set; }
 
-        /// <summary>
-        /// Gets the module path.
-        /// </summary>
+        /// <inheritdoc />
         public string Path { get; private set; }
 
         #endregion
 
+        /// <summary>
+        /// Gets the module identifier.
+        /// </summary>
+        /// <value>
+        /// The module identifier.
+        /// </value>
         public uint ModuleId { get; private set; }
+
+        /// <summary>
+        /// Gets the size of the structure.
+        /// </summary>
+        /// <value>
+        /// The size of the structure.
+        /// </value>
         public uint StructureSize { get; private set; }
+
+        /// <summary>
+        /// Gets the GLBLCNT usage.
+        /// </summary>
+        /// <value>
+        /// The GLBLCNT usage.
+        /// </value>
         public uint GlblcntUsage { get; private set; }
+
+        /// <summary>
+        /// Gets the proccnt usage.
+        /// </summary>
+        /// <value>
+        /// The proccnt usage.
+        /// </value>
         public uint ProccntUsage { get; private set; }
     }
 }

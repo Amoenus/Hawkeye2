@@ -6,11 +6,22 @@ namespace Hawkeye.ComponentModel
 {
     internal static class ModuleInfoExtensions
     {
+        /// <summary>
+        /// Dumps to.
+        /// </summary>
+        /// <param name="module">The module.</param>
+        /// <param name="builder">The builder.</param>
         public static void DumpTo(this IModuleInfo module, StringBuilder builder)
         {
             DumpTo(module, builder, 0);
         }
 
+        /// <summary>
+        /// Dumps to.
+        /// </summary>
+        /// <param name="module">The module.</param>
+        /// <param name="builder">The builder.</param>
+        /// <param name="tabCount">The tab count.</param>
         public static void DumpTo(this IModuleInfo module, StringBuilder builder, int tabCount)
         {
             var converter = new ModuleInfoConverter();

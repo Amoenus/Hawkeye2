@@ -50,4 +50,5 @@ Credits
   [history]: src/History.md "History"
   [credits]: src/Credits.md "Credits"
   
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b4e9d3dc07e44ba48f2c06679ef04c0b)](https://www.codacy.com/app/Amoenus/Hawkeye2?utm_source=github.com&utm_medium=referral&utm_content=Amoenus/Hawkeye2&utm_campaign=badger)
 [![githalytics.com alpha](https://cruel-carlota.gopagoda.com/77cb179f76b1e303722ade7ead633dc6 "githalytics.com")](http://githalytics.com/odalet/Hawkeye2)  

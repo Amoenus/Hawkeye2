@@ -17,9 +17,9 @@ namespace Hawkeye
     {
         private readonly Guid hawkeyeId;
 
-        private MainForm mainForm = null;
-        private MainControl mainControl = null;
-        private ILogServiceFactory logFactory = null;
+        private MainForm _mainForm;
+        private MainControl _mainControl;
+        private ILogServiceFactory _logFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Shell"/> class.
@@ -34,13 +34,16 @@ namespace Hawkeye
 
         #region IHawkeyeHost Members
 
+        /// <inheritdoc />
         public event EventHandler CurrentWindowInfoChanged;
 
+        /// <inheritdoc />
         public ILogService GetLogger(Type type)
         {
             return LogManager.GetLogger(type);
         }
 
+        /// <inheritdoc />
         public ISettingsStore GetSettings(string key)
         {
             if (string.IsNullOrEmpty(key) || key == SettingsManager.HawkeyeStoreKey)
@@ -53,14 +56,28 @@ namespace Hawkeye
             return SettingsManager.GetStore(key);
         }
 
+        /// <inheritdoc />
         public IHawkeyeApplicationInfo ApplicationInfo { get; }
 
-        public IWindowInfo CurrentWindowInfo => mainControl?.CurrentInfo;
+        /// <inheritdoc />
+        public IWindowInfo CurrentWindowInfo => _mainControl?.CurrentInfo;
 
         #endregion
 
+        /// <summary>
+        /// Gets the plugin manager.
+        /// </summary>
+        /// <value>
+        /// The plugin manager.
+        /// </value>
         public PluginManager PluginManager { get; private set;  }
 
+        /// <summary>
+        /// Gets a value indicating whether this instance is injected.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is injected; otherwise, <c>false</c>.
+        /// </value>
         public bool IsInjected { get; private set; }
 
         /// <summary>
@@ -92,7 +109,7 @@ namespace Hawkeye
             InitializeMainForm(windowToSpy);
             LogDebug("Hawkeye Main Form initialization is complete", appId);
 
-            Application.Run(mainForm);
+            Application.Run(_mainForm);
         }
 
         /// <summary>
@@ -124,14 +141,19 @@ namespace Hawkeye
             if (info.ProcessId == Process.GetCurrentProcess().Id) return false;
 
             // Not a .NET process
-            if (info.Clr == Clr.None) return false;
+            switch (info.Clr)
+            {
+                case Clr.None:
+                    return false;
+                case Clr.Unsupported:
+                    return false;
+                case Clr.Undefined:
+                    return HawkeyeApplication.CurrentBitness == Bitness.x86 && info.Bitness == Bitness.x64;
+            }
 
             // Not a supported CLR
-            if (info.Clr == Clr.Unsupported) return false;
 
             // Don't know! But maybe this is because we tried to inspect a x64 process and we are x86...
-            if (info.Clr == Clr.Undefined)
-                return HawkeyeApplication.CurrentBitness == Bitness.x86 && info.Bitness == Bitness.x64;
 
             // Otherwise, ok
             return true;
@@ -148,10 +170,10 @@ namespace Hawkeye
             var handle = info.Handle;
             var bootstrapExecutable = GetBootstrap(info.Clr, info.Bitness);
             var hawkeyeAttacherType = typeof(__HawkeyeAttacherNamespace__.HawkeyeAttacher);
-            var arguments = new string[]
+            var arguments = new[]
                 {
                     handle.ToString(),                                      // Target window
-                    mainForm.Handle.ToString(),                             // Original Hawkeye
+                    _mainForm.Handle.ToString(),                            // Original Hawkeye
                     "\"" + hawkeyeAttacherType.Assembly.Location + "\"",    // This assembly
                     "\"" + hawkeyeAttacherType.FullName + "\"",             // The name of the class responsible for attaching to the process
                     "Attach"                                                // Attach method
@@ -163,7 +185,7 @@ namespace Hawkeye
             LogInfo($"Starting a new instance of Hawkeye: {bootstrapExecutable}");
             LogDebug($"Command is: {bootstrapExecutable} {args}");
 
-            // Close Hawkeye; i.e. clean everything beore it is really killed in the Attach method.
+            // Close Hawkeye; i.e. clean everything before it is really killed in the Attach method.
             Close();
 
             Process.Start(startInfo);
@@ -183,12 +205,11 @@ namespace Hawkeye
             // by the previous Hawkeye instance.
             NativeMethods.SendMessage(originalHawkeyeWindow, WindowMessages.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
 
-            // Let's get the target window associated pid.
-            int pid;
-            NativeMethods.GetWindowThreadProcessId(windowToSpy, out pid);
+            // Let's get the target window associated processId.
+            NativeMethods.GetWindowThreadProcessId(windowToSpy, out int processId);
 
-            var appId = hawkeyeId.GetHashCode();
-            LogInfo($"Running Hawkeye attached to application {Application.ProductName} (pid={pid})", appId);
+            int appId = hawkeyeId.GetHashCode();
+            LogInfo($"Running Hawkeye attached to application {Application.ProductName} (processId={processId})", appId);
             Initialize();
             LogDebug("Hawkeye initialization is complete", appId);
 
@@ -196,7 +217,7 @@ namespace Hawkeye
             LogDebug("Hawkeye Main Form initialization is complete", appId);
 
             // Show new window
-            mainForm.Show();
+            _mainForm.Show();
         }
 
         /// <summary>
@@ -207,16 +228,16 @@ namespace Hawkeye
         /// </returns>
         public ILogServiceFactory GetLogServiceFactory()
         {
-            if (logFactory == null)
+            if (_logFactory == null)
             {
                 // when injected, log4net won't find its configuration where it expects it to be
                 // so we suppose we have a log4net.config file in the root directory of hawkeye.
                 var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var log4netConfigFile = Path.Combine(directory, "log4net.config");
-                logFactory = new Log4NetServiceFactory(log4netConfigFile);
+                _logFactory = new Log4NetServiceFactory(log4netConfigFile);
             }
 
-            return logFactory;
+            return _logFactory;
         }
 
         private void Initialize()
@@ -229,7 +250,7 @@ namespace Hawkeye
 
             LogDebug("Discovering Hawkeye plugins.");
             PluginManager.DiscoverAll();
-            var discoveredCount = PluginManager.PluginDescriptors.Length;
+            int discoveredCount = PluginManager.PluginDescriptors.Length;
 
             LogDebug("Loading Hawkeye plugins.");
             PluginManager.LoadAll(this);
@@ -240,13 +261,13 @@ namespace Hawkeye
 
         private void InitializeMainForm(IntPtr windowToSpy)
         {
-            mainForm?.Close();
-            mainForm = new MainForm();
+            _mainForm?.Close();
+            _mainForm = new MainForm();
             if (windowToSpy != IntPtr.Zero)
-                mainForm.SetTarget(windowToSpy);
+                _mainForm.SetTarget(windowToSpy);
 
-            mainControl = mainForm.MainControl;
-            mainControl.CurrentInfoChanged += (s, _) =>
+            _mainControl = _mainForm.MainControl;
+            _mainControl.CurrentInfoChanged += (s, _) =>
                 RaiseCurrentWindowInfoChanged();
 
             RaiseCurrentWindowInfoChanged();
@@ -293,20 +314,20 @@ namespace Hawkeye
 
         #region Logging
 
-        private static void LogInfo(string message, int appId = 0)
+        private static void LogInfo(string message, int applicationId = 0)
         {
-            Log(LogLevel.Info, message, appId);
+            Log(LogLevel.Info, message, applicationId);
         }
 
-        private static void LogDebug(string message, int appId = 0)
+        private static void LogDebug(string message, int applicationId = 0)
         {
-            Log(LogLevel.Debug, message, appId);
+            Log(LogLevel.Debug, message, applicationId);
         }
 
-        private static void Log(LogLevel level, string message, int appId)
+        private static void Log(LogLevel level, string message, int applicationId)
         {
-            var log = LogManager.GetLogger<Shell>();
-            log.Log(level, appId == 0 ? message : $"{appId.GetHashCode()} - {message}");
+            ILogService log = LogManager.GetLogger<Shell>();
+            log.Log(level, applicationId == 0 ? message : $"{applicationId.GetHashCode()} - {message}");
         }
 
         #endregion

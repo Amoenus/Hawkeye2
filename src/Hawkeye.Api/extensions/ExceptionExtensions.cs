@@ -25,7 +25,7 @@ namespace Hawkeye.Extensions
             string indent = string.Empty;
 
             var builder = new StringBuilder();
-            for (var currentException = exception; currentException != null; currentException = currentException.InnerException)
+            for (Exception currentException = exception; currentException != null; currentException = currentException.InnerException)
             {
                 builder.Append(indent);
                 builder.Append(leafEx);
@@ -33,9 +33,7 @@ namespace Hawkeye.Extensions
                 builder.Append(currentException.GetType());
                 builder.Append("] ");
                 builder.Append(currentException.Message);
-                builder.Append(Environment.NewLine);
-
-                indent += tab;
+                builder.AppendLine(tab);
 
                 AppendStackTrace(currentException, builder, indent, leafTr);
             }

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.ComponentModel;
-
+using System.Windows.Forms;
 using Hawkeye.Logging;
 
 namespace Hawkeye.ComponentModel
@@ -9,10 +8,10 @@ namespace Hawkeye.ComponentModel
     [TypeConverter(typeof(DotNetInfoConverter))]
     internal class ControlInfo : IControlInfo, IProxy
     {
-        private static ILogService log = LogManager.GetLogger<ControlInfo>();
+        private static readonly ILogService Log = LogManager.GetLogger<ControlInfo>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ControlInfo"/> class.
+        ///     Initializes a new instance of the <see cref="ControlInfo" /> class.
         /// </summary>
         /// <param name="hwnd">The Window handle of the control.</param>
         public ControlInfo(IntPtr hwnd)
@@ -22,20 +21,56 @@ namespace Hawkeye.ComponentModel
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ControlInfo"/> class.
+        ///     Initializes a new instance of the <see cref="ControlInfo" /> class.
         /// </summary>
         /// <param name="control">The control.</param>
         public ControlInfo(Control control)
         {
             if (control == null)
-                log.Warning("Specified control is null.");
+            {
+                Log.Warning("Specified control is null.");
+            }
 
             Control = control;
             InitializeTypeDescriptor(Control);
         }
 
+        #region IProxy Members
+
+        /// <inheritdoc />
+        public object Value => Control;
+
+        #endregion
+
+        private static void InitializeTypeDescriptor(object instance)
+        {
+            if (instance == null)
+            {
+                return;
+            }
+
+            Type type = instance.GetType();
+            CustomTypeDescriptors.AddGenericProviderToType(type);
+        }
+
+        private static Control GetControlFromHandle(IntPtr hwnd)
+        {
+            Control control = Control.FromHandle(hwnd); // Usually this is enough
+            if (control == null)
+            {
+                // But in some cases (when inspecting most Visual Studio controls for instance), it is not...
+                // Is there a workaround? It seems that only the VS property grid & the windows forms designer
+                // can be inspected
+                Log.Warning(
+                    $"Handle {hwnd} is not associated with a .NET control: 'Control.FromHandle(hwnd)' returns null.");
+            }
+
+            return control;
+        }
+
         #region IControlInfo Members
 
+        /// <inheritdoc />
         public Control Control
         {
             get;
@@ -46,46 +81,21 @@ namespace Hawkeye.ComponentModel
 #endif
         }
 
+        /// <inheritdoc />
         public string Name
         {
             get
             {
-                if (Control == null) return string.Empty;
-                var name = Control.Name;
-                if (!string.IsNullOrEmpty(name))
-                    return name;
-                return Control.GetType().Name;
+                if (Control == null)
+                {
+                    return string.Empty;
+                }
+
+                string name = Control.Name;
+                return !string.IsNullOrEmpty(name) ? name : Control.GetType().Name;
             }
         }
-
-        #endregion     
-        
-        #region IProxy Members
-
-        public object Value => Control;
 
         #endregion
-
-        private void InitializeTypeDescriptor(object instance)
-        {
-            if (instance == null) return;
-            var type = instance.GetType();
-            CustomTypeDescriptors.AddGenericProviderToType(type);
-        }
-
-        private Control GetControlFromHandle(IntPtr hwnd)
-        {
-            var control = Control.FromHandle(hwnd); // Usually this is enough
-            if (control == null)
-            {
-                // But in some cases (when inspecting most Visual Studio controls for instance), it is not...
-                // Is there a workaround? It seems that only the VS property grid & the windows forms designer
-                // can be inpected
-                log.Warning(
-                    $"Handle {hwnd} is not associated with a .NET control: 'Control.FromHandle(hwnd)' returns null.");
-            }
-
-            return control;
-        }
     }
 }

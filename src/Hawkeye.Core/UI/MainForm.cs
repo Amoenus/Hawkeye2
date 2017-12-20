@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-
+using Hawkeye.ComponentModel;
 using Hawkeye.WinApi;
 using Hawkeye.Configuration;
 
@@ -12,7 +12,7 @@ namespace Hawkeye.UI
     /// </summary>
     internal partial class MainForm : Form, IDefaultLayoutProvider
     {
-        private IntPtr currentSpiedWindow = IntPtr.Zero;
+        private IntPtr _currentSpiedWindow = IntPtr.Zero;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainForm"/> class.
@@ -26,10 +26,8 @@ namespace Hawkeye.UI
 
             mainControl.CurrentInfoChanged += (s, e) =>
             {
-                var info = mainControl.CurrentInfo;
-                var name = string.Empty;
-                if (info != null && info.ControlInfo != null)
-                    name = info.ControlInfo.Name;
+                WindowInfo info = mainControl.CurrentInfo;
+                string name = info.ControlInfo?.Name ?? string.Empty;
                 UpdateTitle(name);
             };
         }
@@ -39,18 +37,15 @@ namespace Hawkeye.UI
         /// </summary>
         public MainFormSettings Settings
         {
-            get
+            get => new MainFormSettings()
             {
-                return new MainFormSettings()
-                {
 
-                    SpiedWindow = mainControl.Target,
-                    Location = Location,
-                    Size = Size,
-                    WindowState = WindowState,
-                    Screen = Screen.FromControl(this)
-                };
-            }
+                SpiedWindow = mainControl.Target,
+                Location = Location,
+                Size = Size,
+                WindowState = WindowState,
+                Screen = Screen.FromControl(this)
+            };
             set
             {
                 if (value == null) return;
@@ -58,13 +53,23 @@ namespace Hawkeye.UI
             }
         }
 
+        /// <summary>
+        /// Gets the main control.
+        /// </summary>
+        /// <value>
+        /// The main control.
+        /// </value>
         internal MainControl MainControl => mainControl;
 
+        /// <summary>
+        /// Sets the target.
+        /// </summary>
+        /// <param name="hwnd">The HWND.</param>
         public void SetTarget(IntPtr hwnd)
         {
             mainControl.Target = hwnd;
         }
-        
+
         #region IDefaultLayoutProvider Members
 
         public Rectangle GetDefaultBounds()
@@ -109,7 +114,7 @@ namespace Hawkeye.UI
                     var wparam = m.WParam.ToInt32();
                     if (wparam == 0)
                     {
-                        // This means the window was disabled. 
+                        // This means the window was disabled.
                         // Whenever we are disabled, let's re-enable ourself
                         // This is needed if we want to be able to spy modal windows
                         NativeMethods.EnableWindow(Handle, true);
@@ -123,14 +128,12 @@ namespace Hawkeye.UI
 
         private void UpdateTitle(string controlName = "")
         {
-            var clr = HawkeyeApplication.CurrentClr.GetLabel();
-            var bitness = HawkeyeApplication.CurrentBitness.ToString().ToLowerInvariant();
-            var clrAndBitness = string.IsNullOrEmpty(clr) ? bitness : clr + " " + bitness;
+            string clr = HawkeyeApplication.CurrentClr.GetLabel();
+            string bitness = HawkeyeApplication.CurrentBitness.ToString().ToLowerInvariant();
+            string clrAndBitness = string.IsNullOrEmpty(clr) ? bitness : clr + " " + bitness;
 
-            var title = $"Hawkeye {clrAndBitness}";
-            if (string.IsNullOrEmpty(controlName))
-                base.Text = title;
-            else base.Text = $"{controlName} - {title}";
+            string title = $"Hawkeye {clrAndBitness}";
+            Text = string.IsNullOrEmpty(controlName) ? title : $"{controlName} - {title}";
         }
 
         private void SetWindowSettings(MainFormSettings settings)

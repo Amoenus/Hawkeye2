@@ -46,14 +46,14 @@ namespace Hawkeye.ComponentModel
         /// Gets the list of modules loaded by this Window's owner process.
         /// </summary>
         public IModuleInfo[] Modules { get; private set; }
-        
+
         /// <summary>
-        /// Get this Window owner's thread Id 
+        /// Get this Window owner's thread Id
         /// </summary>
         public int ThreadId { get; private set; }
-        
+
         /// <summary>
-        /// Get this Window owner's process Id 
+        /// Get this Window owner's process Id
         /// </summary>
         public int ProcessId { get; private set; }
 
@@ -108,20 +108,19 @@ namespace Hawkeye.ComponentModel
         {
             ControlInfo = null;
             if (Clr == Clr.Net2 || Clr == Clr.Net4)
-                ControlInfo = new ControlInfo(Handle);            
+                ControlInfo = new ControlInfo(Handle);
         }
 
         private void RunDetection()
         {
-            int pid;
-            ThreadId = NativeMethods.GetWindowThreadProcessId(Handle, out pid);
-            ProcessId = pid;
+            ThreadId = NativeMethods.GetWindowThreadProcessId(Handle, out int processId);
+            ProcessId = processId;
             ClassName = NativeMethods.GetWindowClassName(Handle);
-            Modules = GetModules(pid).Select(m => new ModuleInfo(m)).ToArray();
-            
+            Modules = GetModules(processId).Select(m => new ModuleInfo(m)).ToArray();
+
             Bitness = DetectBitness();
-            
-            Clr = DetectFramework();            
+
+            Clr = DetectFramework();
         }
 
         private Clr DetectFramework()
@@ -138,7 +137,7 @@ namespace Hawkeye.ComponentModel
 
             if (mscorlibsVersion.Any(v => v == 4)) return Clr.Net4;
             if (mscorlibsVersion.Any(v => v >= 2 && v < 4)) return Clr.Net2;
-            
+
             // We have mscorlib assemblies, but we can't tell whether they are .NET 2 or 4; let's say they are unsupported.
             log.Warning(
                 $"Unknown mscorlib versions:\r\n{string.Join("----------------------------------------\r\n", mscorlibs.Select(m => FileVersionInfo.GetVersionInfo(m.Path).ToString()).ToArray())}");
@@ -149,7 +148,7 @@ namespace Hawkeye.ComponentModel
         private Bitness DetectBitness()
         {
             // In case we are a x64 process, we detect wether the inspected
-            // window is running in Wow64 mode; if this is the case, the 
+            // window is running in Wow64 mode; if this is the case, the
             // inspected app is a 32bits application running on a x64 box.
             // Hope nobody will have the good idea to name one of its dll
             // wow64 in a 32bits app... ;)
@@ -194,8 +193,8 @@ namespace Hawkeye.ComponentModel
         }
 
         #region IWindowInfo Members
-        
-        
+
+
 
         #endregion
     }

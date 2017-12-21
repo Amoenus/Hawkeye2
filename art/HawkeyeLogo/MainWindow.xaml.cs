@@ -1,21 +1,37 @@
 ﻿using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace HawkeyeLogo
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly string defaultDirectory = @"c:\temp";
+        private const string DefaultDirectory = @"c:\temp";
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainWindow"/> class.
+        /// The exported size property
+        /// </summary>
+        public static readonly DependencyProperty ExportedSizeProperty = DependencyProperty.Register(
+            "ExportedSize", typeof(int), typeof(MainWindow), new PropertyMetadata(256));
+
+        /// <summary>
+        /// The save all sizes property
+        /// </summary>
+        public static readonly DependencyProperty SaveAllSizesProperty = DependencyProperty.Register(
+            "SaveAllSizes", typeof(bool?), typeof(MainWindow), new PropertyMetadata(true));
+
+        /// <summary>
+        /// The output directory property
+        /// </summary>
+        public static readonly DependencyProperty OutputDirectoryProperty = DependencyProperty.Register(
+            "OutputDirectory", typeof(string), typeof(MainWindow), new PropertyMetadata(DefaultDirectory));
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MainWindow" /> class.
         /// </summary>
         public MainWindow()
         {
@@ -24,32 +40,41 @@ namespace HawkeyeLogo
             DataContext = this;
         }
 
+        /// <summary>
+        /// Gets or sets the size of the exported.
+        /// </summary>
+        /// <value>
+        /// The size of the exported.
+        /// </value>
         public int ExportedSize
         {
-            get { return (int)GetValue(ExportedSizeProperty); }
-            set { SetValue(ExportedSizeProperty, value); }
+            get => (int) GetValue(ExportedSizeProperty);
+            set => SetValue(ExportedSizeProperty, value);
         }
 
-        public static readonly DependencyProperty ExportedSizeProperty = DependencyProperty.Register(
-            "ExportedSize", typeof(int), typeof(MainWindow), new PropertyMetadata(256));
-        
+        /// <summary>
+        /// Gets or sets the save all sizes.
+        /// </summary>
+        /// <value>
+        /// The save all sizes.
+        /// </value>
         public bool? SaveAllSizes
         {
-            get { return (bool?)GetValue(SaveAllSizesProperty); }
-            set { SetValue(SaveAllSizesProperty, value); }
+            get => (bool?) GetValue(SaveAllSizesProperty);
+            set => SetValue(SaveAllSizesProperty, value);
         }
 
-        public static readonly DependencyProperty SaveAllSizesProperty = DependencyProperty.Register(
-            "SaveAllSizes", typeof(bool?), typeof(MainWindow), new PropertyMetadata(true));
-        
+        /// <summary>
+        /// Gets or sets the output directory.
+        /// </summary>
+        /// <value>
+        /// The output directory.
+        /// </value>
         public string OutputDirectory
         {
-            get { return (string)GetValue(OutputDirectoryProperty); }
-            set { SetValue(OutputDirectoryProperty, value); }
+            get => (string) GetValue(OutputDirectoryProperty);
+            set => SetValue(OutputDirectoryProperty, value);
         }
-
-        public static readonly DependencyProperty OutputDirectoryProperty = DependencyProperty.Register(
-            "OutputDirectory", typeof(string), typeof(MainWindow), new PropertyMetadata(defaultDirectory));       
 
         private void Save(int size)
         {
@@ -58,31 +83,41 @@ namespace HawkeyeLogo
                 h1, h2, h3, h4
             };
 
-            var saved = Cursor;
+            Cursor saved = Cursor;
             Cursor = Cursors.Wait;
             try
             {
-                foreach (var control in controls)
+                foreach (Control control in controls)
                 {
-                    var filename = Path.Combine(OutputDirectory, control.Name + "_" + size + ".png");
+                    string filename = Path.Combine(OutputDirectory, control.Name + "_" + size + @".png");
                     control.SaveTo(size, size, filename);
                 }
             }
-            finally { Cursor = saved; }
+            finally
+            {
+                Cursor = saved;
+            }
         }
 
         private void SaveAll()
         {
-            var sizes = new int[] { 16, 24, 32, 64, 128, 256, 512, 1024 };
-            foreach (var size in sizes)
+            var sizes = new[] {16, 24, 32, 64, 128, 256, 512, 1024};
+            foreach (int size in sizes)
+            {
                 Save(size);
+            }
         }
 
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
             if (SaveAllSizes.HasValue && SaveAllSizes.Value)
+            {
                 SaveAll();
-            else Save(ExportedSize);
+            }
+            else
+            {
+                Save(ExportedSize);
+            }
         }
     }
 }

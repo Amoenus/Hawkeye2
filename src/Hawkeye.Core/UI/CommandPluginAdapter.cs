@@ -1,68 +1,75 @@
 ﻿using System;
 using System.Windows.Forms;
-
 using Hawkeye.Extensibility;
 
 namespace Hawkeye.UI
 {
     internal class CommandPluginAdapter
     {
-        private readonly ICommandPlugin plugin;
-        private bool enabled = false;
-        private ToolStripButton button = null;
+        private readonly ICommandPlugin _plugin;
+        private ToolStripButton _button;
+        private bool _enabled;
 
         public CommandPluginAdapter(ICommandPlugin commandPlugin)
         {
-            if (commandPlugin == null) throw new ArgumentNullException(nameof(commandPlugin));
-            plugin = commandPlugin;
+            _plugin = commandPlugin ?? throw new ArgumentNullException(nameof(commandPlugin));
 
             CreateControls();
         }
-        
+
         public bool Enabled
         {
-            get { return enabled; }
+            get => _enabled;
             private set
             {
-                if (enabled == value) return;
-                enabled = value;
-                EnableControls(enabled);
+                if (_enabled == value)
+                {
+                    return;
+                }
+
+                _enabled = value;
+                EnableControls(_enabled);
             }
         }
 
         internal void InsertToolStripButton(ToolStrip strip, int index)
         {
-            strip.Items.Insert(index, button);
+            strip.Items.Insert(index, _button);
         }
 
         private void CreateControls()
         {
-            button = CreateToolStripButton();
-            button.Click += (s, _) => plugin.Execute(); 
+            _button = CreateToolStripButton();
+            _button.Click += (s, _) => _plugin.Execute();
 
-            plugin.CanExecuteChanged += (s, _) =>
-                Enabled = plugin.CanExecute();
+            _plugin.CanExecuteChanged += (s, _) =>
+                Enabled = _plugin.CanExecute();
         }
 
         private void EnableControls(bool enable)
         {
-            button.Enabled = enable;
+            _button.Enabled = enable;
         }
 
         private ToolStripButton CreateToolStripButton()
         {
-            var label = plugin.Label;
+            string label = _plugin.Label;
             if (string.IsNullOrEmpty(label))
-                label = plugin.Descriptor.Name;
+            {
+                label = _plugin.Descriptor.Name;
+            }
 
             var button = new ToolStripButton(label);
 
-            if (plugin.Image != null)
+            if (_plugin.Image != null)
             {
-                button.Image = plugin.Image;
+                button.Image = _plugin.Image;
                 button.DisplayStyle = ToolStripItemDisplayStyle.Image;
             }
-            else button.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            else
+            {
+                button.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            }
 
             return button;
         }

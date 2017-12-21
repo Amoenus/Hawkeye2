@@ -1,54 +1,51 @@
-﻿using System.Linq;
+﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
-
 using Hawkeye.Reflection;
 
 namespace Hawkeye.UI.Controls
 {
     // Search Box implementation
-    partial class PropertyGridEx
+    internal partial class PropertyGridEx
     {
-        private TextBox searchBox = null;
-        private Color searchBoxBackColor = Color.White;
+        private FieldAccessor _allGridEntriesAccessor;
+        private GridItem[] _currentGridItems;
+        private FieldAccessor _gridViewEntriesAccessor;
 
-        private object reflectedGridView = null;
-        private GridItem[] currentGridItems = null;
+        private object _reflectedGridView;
+        private MethodAccessor _refreshAccessor;
+        private TextBox _searchBox;
+        private Color _searchBoxBackColor = Color.White;
 
-        private FieldAccessor allGridEntriesAccessor = null;
-        private FieldAccessor topLevelGridEntriesAccessor = null;
-        private FieldAccessor totalPropsAccessor = null;
-        private FieldAccessor selectedRowAccessor = null;
-        private FieldAccessor gridViewEntriesAccessor = null;
+        private PropertyAccessor _selectedGridEntryAccessor;
+        private FieldAccessor _selectedRowAccessor;
 
-        private MethodAccessor setScrollOffsetAccessor = null;
-        private MethodAccessor refreshAccessor = null;
-
-        private PropertyAccessor selectedGridEntryAccessor = null;
-
-        //private FieldAccessor gridViewAccesor = null;
-        //private FieldInfo gridViewField = null;
+        private MethodAccessor _setScrollOffsetAccessor;
+        private FieldAccessor _topLevelGridEntriesAccessor;
+        private FieldAccessor _totalPropsAccessor;
 
         private void InitializeSearchBox()
         {
-            if (searchBox != null) return;
+            if (_searchBox != null)
+            {
+                return;
+            }
 
-            //const BindingFlags bflags = BindingFlags.Instance | BindingFlags.NonPublic;
+            _searchBox = new TextBox();
+            _searchBox.Location = new Point(0, 0);
+            _searchBox.Size = new Size(70, _searchBox.Height);
+            _searchBox.BorderStyle = BorderStyle.Fixed3D;
+            _searchBox.Font = new Font("Tahoma", 8.25f);
 
-            searchBox = new TextBox();
-            searchBox.Location = new Point(0, 0);
-            searchBox.Size = new Size(70, searchBox.Height);
-            searchBox.BorderStyle = BorderStyle.Fixed3D;
-            searchBox.Font = new Font("Tahoma", 8.25f);
+            _searchBoxBackColor = _searchBox.BackColor;
 
-            searchBoxBackColor = searchBox.BackColor;
+            _searchBox.TextChanged += (s, _) => ApplyFilter();
 
-            searchBox.TextChanged += (s, _) => ApplyFilter();
-            
             // Hack: let's remove the read-only flag on the toolstrip controls collection
             var rofield = new FieldAccessor(ToolStrip.Controls, "_isReadOnly");
             rofield.Set(false);
-            ToolStrip.Controls.Add(searchBox);
+            ToolStrip.Controls.Add(_searchBox);
             rofield.Set(true);
 
             ToolStrip.SizeChanged += (s, _) => FixSearchBoxLocation();
@@ -58,71 +55,86 @@ namespace Hawkeye.UI.Controls
             // And now initialize accessors
             InitializeAccessors();
 
-            PropertyTabChanged += (s, _) => searchBox.Text = string.Empty;
-            PropertySortChanged += (s, _) => searchBox.Text = string.Empty;
-            SelectedObjectsChanged += (s, _) => searchBox.Text = string.Empty;
+            PropertyTabChanged += (s, _) => _searchBox.Text = string.Empty;
+            PropertySortChanged += (s, _) => _searchBox.Text = string.Empty;
+            SelectedObjectsChanged += (s, _) => _searchBox.Text = string.Empty;
         }
 
         private void InitializeAccessors()
         {
             var gridViewAccessor = new FieldAccessor(this, "gridView");
-            reflectedGridView = gridViewAccessor.Get();
-            var gridViewType = reflectedGridView.GetType();
+            _reflectedGridView = gridViewAccessor.Get();
+            Type gridViewType = _reflectedGridView.GetType();
 
-            allGridEntriesAccessor = new FieldAccessor(reflectedGridView, "allGridEntries");
-            topLevelGridEntriesAccessor = new FieldAccessor(reflectedGridView, "topLevelGridEntries");
-            totalPropsAccessor = new FieldAccessor(reflectedGridView, "totalProps");
-            selectedRowAccessor = new FieldAccessor(reflectedGridView, "selectedRow");
+            _allGridEntriesAccessor = new FieldAccessor(_reflectedGridView, "allGridEntries");
+            _topLevelGridEntriesAccessor = new FieldAccessor(_reflectedGridView, "topLevelGridEntries");
+            _totalPropsAccessor = new FieldAccessor(_reflectedGridView, "totalProps");
+            _selectedRowAccessor = new FieldAccessor(_reflectedGridView, "selectedRow");
 
-            setScrollOffsetAccessor = new MethodAccessor(gridViewType, "SetScrollOffset");
-            refreshAccessor = new MethodAccessor(gridViewType, "Refresh");
+            _setScrollOffsetAccessor = new MethodAccessor(gridViewType, "SetScrollOffset");
+            _refreshAccessor = new MethodAccessor(gridViewType, "Refresh");
 
-            selectedGridEntryAccessor = new PropertyAccessor(reflectedGridView, "SelectedGridEntry");
+            _selectedGridEntryAccessor = new PropertyAccessor(_reflectedGridView, "SelectedGridEntry");
         }
 
         private void ApplyFilter()
         {
-            var search = searchBox.Text.ToLowerInvariant();
+            string search = _searchBox.Text.ToLowerInvariant();
+
             if (string.IsNullOrEmpty(search))
-                searchBox.BackColor = searchBoxBackColor;
+            {
+                _searchBox.BackColor = _searchBoxBackColor;
+            }
             else
             {
-                if (search.StartsWith("?"))
-                    searchBox.BackColor = Color.LightBlue;
-                else
-                    searchBox.BackColor = Color.Coral;
+                _searchBox.BackColor = search.StartsWith("?") ? Color.LightBlue : Color.Coral;
             }
 
-            if (base.SelectedObject == null) return;
-
-            var items = GetGridViewItems();
-            if (items == null)
-                return;
-
-            if (string.IsNullOrEmpty(search) && currentGridItems != null)
+            if (SelectedObject == null)
             {
-                currentGridItems = null;
-                base.Refresh();
                 return;
             }
 
-            if (currentGridItems == null)
-                currentGridItems = items;
+            GridItem[] items = GetGridViewItems();
+            if (items == null)
+            {
+                return;
+            }
 
-            var containsMode = search.StartsWith("?");
+            if (string.IsNullOrEmpty(search) && _currentGridItems != null)
+            {
+                _currentGridItems = null;
+                Refresh();
+                return;
+            }
+
+            if (_currentGridItems == null)
+            {
+                _currentGridItems = items;
+            }
+
+            bool containsMode = search.StartsWith("?");
             if (containsMode)
+            {
                 search = search.Substring(1);
+            }
 
             // Filter out
-            var keptItems = currentGridItems.Where(item =>
+            GridItem[] keptItems = _currentGridItems.Where(item =>
             {
-                if (string.IsNullOrEmpty(item.Label)) return false;
-                if (item.GridItemType != GridItemType.Property) return false;
-                var label = item.Label.ToLowerInvariant();
+                if (string.IsNullOrEmpty(item.Label))
+                {
+                    return false;
+                }
 
-                return containsMode ?
-                    label.Contains(search) :
-                    label.StartsWith(search);
+                if (item.GridItemType != GridItemType.Property)
+                {
+                    return false;
+                }
+
+                string label = item.Label.ToLowerInvariant();
+
+                return containsMode ? label.Contains(search) : label.StartsWith(search);
             }).ToArray();
 
             SetGridViewItems(keptItems);
@@ -130,51 +142,66 @@ namespace Hawkeye.UI.Controls
 
         private GridItem[] GetGridViewItems()
         {
-            var items = allGridEntriesAccessor.Get();
+            object items = _allGridEntriesAccessor.Get();
             if (items == null)
+            {
                 return null;
+            }
 
-            if (gridViewEntriesAccessor == null)
-                gridViewEntriesAccessor = new FieldAccessor(items, "entries");
+            if (_gridViewEntriesAccessor == null)
+            {
+                _gridViewEntriesAccessor = new FieldAccessor(items, "entries");
+            }
 
-            return gridViewEntriesAccessor.Get(items) as GridItem[];
+            return _gridViewEntriesAccessor.Get(items) as GridItem[];
         }
 
         private void SetGridViewItems(GridItem[] newItems)
         {
-            var items = allGridEntriesAccessor.Get();
+            object items = _allGridEntriesAccessor.Get();
             if (items == null)
+            {
                 return;
+            }
 
-            if (newItems == null) newItems = new GridItem[0];
+            if (newItems == null)
+            {
+                newItems = new GridItem[0];
+            }
 
-            var wasFocused = searchBox.Focused;
+            bool wasFocused = _searchBox.Focused;
 
-            if (gridViewEntriesAccessor == null)
-                gridViewEntriesAccessor = new FieldAccessor(items, "entries");
+            if (_gridViewEntriesAccessor == null)
+            {
+                _gridViewEntriesAccessor = new FieldAccessor(items, "entries");
+            }
 
-            setScrollOffsetAccessor.Invoke(reflectedGridView, 0);
+            _setScrollOffsetAccessor.Invoke(_reflectedGridView, 0);
 
-            gridViewEntriesAccessor.Set(newItems, items);
-            gridViewEntriesAccessor.Set(newItems, topLevelGridEntriesAccessor.Get());
+            _gridViewEntriesAccessor.Set(newItems, items);
+            _gridViewEntriesAccessor.Set(newItems, _topLevelGridEntriesAccessor.Get());
 
-            totalPropsAccessor.Set(newItems.Length);
-            selectedRowAccessor.Set(0);
+            _totalPropsAccessor.Set(newItems.Length);
+            _selectedRowAccessor.Set(0);
 
             if (newItems.Length > 0)
-                selectedGridEntryAccessor.Set(newItems[0]);
+            {
+                _selectedGridEntryAccessor.Set(newItems[0]);
+            }
 
-            ((Control)reflectedGridView).Invalidate();
+            ((Control) _reflectedGridView).Invalidate();
 
             if (wasFocused)
-                searchBox.Focus();
+            {
+                _searchBox.Focus();
+            }
         }
 
         private void FixSearchBoxLocation()
         {
-            searchBox.Location = new Point(
-                ToolStrip.Width - searchBox.Width - 2,
-                (ToolStrip.Height - searchBox.Height) / 2);
+            _searchBox.Location = new Point(
+                ToolStrip.Width - _searchBox.Width - 2,
+                (ToolStrip.Height - _searchBox.Height) / 2);
         }
     }
 }

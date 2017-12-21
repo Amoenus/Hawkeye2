@@ -1,27 +1,30 @@
-﻿using System.Windows.Forms;
-using System.Reflection;
+﻿using System.Reflection;
+using System.Windows.Forms;
 
 namespace FxDetector
 {
     // Inspiration found in Hawkeye's search box extender
     internal class PropertyGridEx : PropertyGrid
     {
-        private bool alreadyInitialized = false;
-        private ToolStrip thisToolStrip = null;
+        private bool _alreadyInitialized;
+        private ToolStrip _thisToolStrip;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyGridEx"/> class.
+        ///     Initializes a new instance of the <see cref="PropertyGridEx" />
+        ///     class.
         /// </summary>
+        /// <inheritdoc />
         public PropertyGridEx()
-            : base()
         {
-            base.ToolStripRenderer = new ToolStripProfessionalRenderer()
+            ToolStripRenderer = new ToolStripProfessionalRenderer
             {
                 RoundedEdges = false
             };
 
             if (IsHandleCreated)
+            {
                 InitializeToolStrip();
+            }
             else
             {
                 HandleCreated += (s, e) => InitializeToolStrip();
@@ -33,33 +36,34 @@ namespace FxDetector
         {
             get
             {
-                if (thisToolStrip == null)
+                if (_thisToolStrip != null)
                 {
-                    var field = typeof(PropertyGrid).GetField("toolStrip",
-                        BindingFlags.Instance | BindingFlags.NonPublic);
-                    thisToolStrip = (ToolStrip)field.GetValue(this);
+                    return _thisToolStrip;
                 }
 
-                return thisToolStrip;
+                FieldInfo field = typeof(PropertyGrid).GetField("toolStrip",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+                _thisToolStrip = (ToolStrip) field.GetValue(this);
+
+                return _thisToolStrip;
             }
         }
 
-        public ToolStripButton DetectButton
-        {
-            get;
-            private set;
-        }
+        public ToolStripButton DetectButton { get; private set; }
 
-        public ToolStripButton DumpButton
-        {
-            get;
-            private set;
-        }
+        public ToolStripButton DumpButton { get; private set; }
 
         private void InitializeToolStrip()
         {
-            if (alreadyInitialized) return;
-            if (ToolStrip == null) return;
+            if (_alreadyInitialized)
+            {
+                return;
+            }
+
+            if (ToolStrip == null)
+            {
+                return;
+            }
 
             DetectButton = new ToolStripButton("Detect")
             {
@@ -74,7 +78,7 @@ namespace FxDetector
             ToolStrip.Items.Add(new ToolStripSeparator());
             ToolStrip.Items.Add(DetectButton);
             ToolStrip.Items.Add(DumpButton);
-            alreadyInitialized = true;
+            _alreadyInitialized = true;
         }
     }
 }

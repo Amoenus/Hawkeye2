@@ -1,28 +1,28 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Diagnostics;
 using System.Windows.Forms;
-
-using Hawkeye.UI;
-using Hawkeye.WinApi;
-using Hawkeye.Logging;
-using Hawkeye.Logging.log4net;
 using Hawkeye.Configuration;
 using Hawkeye.Extensibility;
+using Hawkeye.Logging;
+using Hawkeye.Logging.log4net;
+using Hawkeye.UI;
+using Hawkeye.WinApi;
+using __HawkeyeAttacherNamespace__;
 
 namespace Hawkeye
 {
     internal class Shell : IHawkeyeHost
     {
         private readonly Guid hawkeyeId;
+        private ILogServiceFactory _logFactory;
+        private MainControl _mainControl;
 
         private MainForm _mainForm;
-        private MainControl _mainControl;
-        private ILogServiceFactory _logFactory;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Shell"/> class.
+        ///     Initializes a new instance of the <see cref="Shell" /> class.
         /// </summary>
         public Shell()
         {
@@ -32,56 +32,24 @@ namespace Hawkeye
             // Do nothing else here, otherwise, HawkeyeApplication static constructor may fail.
         }
 
-        #region IHawkeyeHost Members
-
-        /// <inheritdoc />
-        public event EventHandler CurrentWindowInfoChanged;
-
-        /// <inheritdoc />
-        public ILogService GetLogger(Type type)
-        {
-            return LogManager.GetLogger(type);
-        }
-
-        /// <inheritdoc />
-        public ISettingsStore GetSettings(string key)
-        {
-            if (string.IsNullOrEmpty(key) || key == SettingsManager.HawkeyeStoreKey)
-            {
-                // Let's get a read-only version of Hawkeye settings
-                var hawkeyeSettings = SettingsManager.GetHawkeyeStore();
-                return new SettingsManager.ReadOnlyStoreWrapper(hawkeyeSettings);
-            }
-
-            return SettingsManager.GetStore(key);
-        }
-
-        /// <inheritdoc />
-        public IHawkeyeApplicationInfo ApplicationInfo { get; }
-
-        /// <inheritdoc />
-        public IWindowInfo CurrentWindowInfo => _mainControl?.CurrentInfo;
-
-        #endregion
-
         /// <summary>
-        /// Gets the plugin manager.
+        ///     Gets the plugin manager.
         /// </summary>
         /// <value>
-        /// The plugin manager.
+        ///     The plugin manager.
         /// </value>
-        public PluginManager PluginManager { get; private set;  }
+        public PluginManager PluginManager { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether this instance is injected.
+        ///     Gets a value indicating whether this instance is injected.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is injected; otherwise, <c>false</c>.
+        ///     <c>true</c> if this instance is injected; otherwise, <c>false</c> .
         /// </value>
         public bool IsInjected { get; private set; }
 
         /// <summary>
-        /// Runs the Hawkeye application.
+        ///     Runs the Hawkeye application.
         /// </summary>
         public void Run()
         {
@@ -89,7 +57,7 @@ namespace Hawkeye
         }
 
         /// <summary>
-        /// Runs the Hawkeye application.
+        ///     Runs the Hawkeye application.
         /// </summary>
         /// <param name="windowToSpy">The window to spy.</param>
         /// <param name="windowToKill">The window to kill.</param>
@@ -97,10 +65,13 @@ namespace Hawkeye
         {
             // close original window: must be done before we try to log anything because the log file is locked
             // by the previous Hawkeye instance.
-            if (windowToKill != IntPtr.Zero) NativeMethods.SendMessage(
-                windowToKill, WindowMessages.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+            if (windowToKill != IntPtr.Zero)
+            {
+                NativeMethods.SendMessage(
+                    windowToKill, WindowMessages.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+            }
 
-            var appId = hawkeyeId.GetHashCode();
+            int appId = hawkeyeId.GetHashCode();
             LogInfo("Running Hawkeye in its own process.", appId);
             LogDebug($"Parameters: {windowToSpy}, {windowToKill}.", appId);
             Initialize();
@@ -113,7 +84,7 @@ namespace Hawkeye
         }
 
         /// <summary>
-        /// Operations that should be realized before we close Hawkeye.
+        ///     Operations that should be realized before we close Hawkeye.
         /// </summary>
         public void Close()
         {
@@ -127,18 +98,25 @@ namespace Hawkeye
         }
 
         /// <summary>
-        /// Determines whether Hawkeye can be injected given the specified window info.
+        ///     Determines whether Hawkeye can be injected given the specified
+        ///     window info.
         /// </summary>
         /// <param name="info">The window info.</param>
         /// <returns>
-        ///   <c>true</c> if Hawkeye can be injected; otherwise, <c>false</c>.
+        ///     <c>true</c> if Hawkeye can be injected; otherwise, <c>false</c> .
         /// </returns>
         public bool CanInject(IWindowInfo info)
         {
-            if (info == null) return false;
+            if (info == null)
+            {
+                return false;
+            }
 
             // Same process, don't inject.
-            if (info.ProcessId == Process.GetCurrentProcess().Id) return false;
+            if (info.ProcessId == Process.GetCurrentProcess().Id)
+            {
+                return false;
+            }
 
             // Not a .NET process
             switch (info.Clr)
@@ -160,26 +138,30 @@ namespace Hawkeye
         }
 
         /// <summary>
-        /// Attaches the specified info.
+        ///     Attaches the specified info.
         /// </summary>
         /// <param name="info">The info.</param>
         public void Inject(IWindowInfo info)
         {
-            if (info == null) throw new ArgumentNullException(nameof(info));
+            if (info == null)
+            {
+                throw new ArgumentNullException(nameof(info));
+            }
 
-            var handle = info.Handle;
-            var bootstrapExecutable = GetBootstrap(info.Clr, info.Bitness);
-            var hawkeyeAttacherType = typeof(__HawkeyeAttacherNamespace__.HawkeyeAttacher);
+            IntPtr handle = info.Handle;
+            string bootstrapExecutable = GetBootstrap(info.Clr, info.Bitness);
+            Type hawkeyeAttacherType = typeof(HawkeyeAttacher);
             var arguments = new[]
-                {
-                    handle.ToString(),                                      // Target window
-                    _mainForm.Handle.ToString(),                            // Original Hawkeye
-                    "\"" + hawkeyeAttacherType.Assembly.Location + "\"",    // This assembly
-                    "\"" + hawkeyeAttacherType.FullName + "\"",             // The name of the class responsible for attaching to the process
-                    "Attach"                                                // Attach method
-                };
+            {
+                handle.ToString(), // Target window
+                _mainForm.Handle.ToString(), // Original Hawkeye
+                "\"" + hawkeyeAttacherType.Assembly.Location + "\"", // This assembly
+                "\"" + hawkeyeAttacherType.FullName +
+                "\"", // The name of the class responsible for attaching to the process
+                "Attach" // Attach method
+            };
 
-            var args = string.Join(" ", arguments);
+            string args = string.Join(" ", arguments);
             var startInfo = new ProcessStartInfo(bootstrapExecutable, args);
 
             LogInfo($"Starting a new instance of Hawkeye: {bootstrapExecutable}");
@@ -192,10 +174,12 @@ namespace Hawkeye
         }
 
         /// <summary>
-        /// Injects the specified target window.
+        ///     Injects the specified target window.
         /// </summary>
         /// <param name="windowToSpy">The target window.</param>
-        /// <param name="originalHawkeyeWindow">The original hawkeye window.</param>
+        /// <param name="originalHawkeyeWindow">
+        ///     The original hawkeye window.
+        /// </param>
         public void Attach(IntPtr windowToSpy, IntPtr originalHawkeyeWindow)
         {
             // Because native c++ code called Attach, we now know we are injected.
@@ -209,7 +193,8 @@ namespace Hawkeye
             NativeMethods.GetWindowThreadProcessId(windowToSpy, out int processId);
 
             int appId = hawkeyeId.GetHashCode();
-            LogInfo($"Running Hawkeye attached to application {Application.ProductName} (processId={processId})", appId);
+            LogInfo($"Running Hawkeye attached to application {Application.ProductName} (processId={processId})",
+                appId);
             Initialize();
             LogDebug("Hawkeye initialization is complete", appId);
 
@@ -221,10 +206,10 @@ namespace Hawkeye
         }
 
         /// <summary>
-        /// Gets the default log service factory.
+        ///     Gets the default log service factory.
         /// </summary>
         /// <returns>
-        /// An instance of <see cref="ILogServiceFactory"/>.
+        ///     An instance of <see cref="ILogServiceFactory" /> .
         /// </returns>
         public ILogServiceFactory GetLogServiceFactory()
         {
@@ -232,8 +217,8 @@ namespace Hawkeye
             {
                 // when injected, log4net won't find its configuration where it expects it to be
                 // so we suppose we have a log4net.config file in the root directory of hawkeye.
-                var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var log4netConfigFile = Path.Combine(directory, "log4net.config");
+                string directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string log4netConfigFile = Path.Combine(directory, "log4net.config");
                 _logFactory = new Log4NetServiceFactory(log4netConfigFile);
             }
 
@@ -264,7 +249,9 @@ namespace Hawkeye
             _mainForm?.Close();
             _mainForm = new MainForm();
             if (windowToSpy != IntPtr.Zero)
+            {
                 _mainForm.SetTarget(windowToSpy);
+            }
 
             _mainControl = _mainForm.MainControl;
             _mainControl.CurrentInfoChanged += (s, _) =>
@@ -283,12 +270,16 @@ namespace Hawkeye
             string bitnessVersion;
             switch (bitness)
             {
-                case Bitness.x86: bitnessVersion = "x86"; break;
-                case Bitness.x64: bitnessVersion = "x64"; break;
+                case Bitness.x86:
+                    bitnessVersion = "x86";
+                    break;
+                case Bitness.x64:
+                    bitnessVersion = "x64";
+                    break;
                 default: throw new ArgumentException($"Bitness Value {bitness} is invalid.", nameof(bitness));
             }
 
-            var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             // Very special case: Hawkeye is x86 and the spied process is x64: we can't know for sure
             // whether the process is .NET 2 or 4 or none.
@@ -297,20 +288,59 @@ namespace Hawkeye
             // detection is achieved, this time from a x64 process.
             // Note that because we run Hawkeye.exe, we won't inject anything.
             if (clr == Clr.Undefined && HawkeyeApplication.CurrentBitness == Bitness.x86 && bitness == Bitness.x64)
-                return Path.Combine(directory, "Hawkeye.exe");
-
-            var clrVersion = string.Empty;
-            switch (clr)
             {
-                case Clr.Net2: clrVersion = "N2"; break;
-                case Clr.Net4: clrVersion = "N4"; break;
-                default: throw new ArgumentException(
-                    $"Clr Value {clr} is invalid.", nameof(clr));
+                return Path.Combine(directory, "Hawkeye.exe");
             }
 
-            var exe = $"HawkeyeBootstrap{clrVersion}{bitnessVersion}.exe";
+            string clrVersion = string.Empty;
+            switch (clr)
+            {
+                case Clr.Net2:
+                    clrVersion = "N2";
+                    break;
+                case Clr.Net4:
+                    clrVersion = "N4";
+                    break;
+                default:
+                    throw new ArgumentException(
+                        $"Clr Value {clr} is invalid.", nameof(clr));
+            }
+
+            string exe = $"HawkeyeBootstrap{clrVersion}{bitnessVersion}.exe";
             return Path.Combine(directory, exe);
         }
+
+        #region IHawkeyeHost Members
+
+        /// <inheritdoc />
+        public event EventHandler CurrentWindowInfoChanged;
+
+        /// <inheritdoc />
+        public ILogService GetLogger(Type type)
+        {
+            return LogManager.GetLogger(type);
+        }
+
+        /// <inheritdoc />
+        public ISettingsStore GetSettings(string key)
+        {
+            if (string.IsNullOrEmpty(key) || key == SettingsManager.HawkeyeStoreKey)
+            {
+                // Let's get a read-only version of Hawkeye settings
+                ISettingsStore hawkeyeSettings = SettingsManager.GetHawkeyeStore();
+                return new SettingsManager.ReadOnlyStoreWrapper(hawkeyeSettings);
+            }
+
+            return SettingsManager.GetStore(key);
+        }
+
+        /// <inheritdoc />
+        public IHawkeyeApplicationInfo ApplicationInfo { get; }
+
+        /// <inheritdoc />
+        public IWindowInfo CurrentWindowInfo => _mainControl?.CurrentInfo;
+
+        #endregion
 
         #region Logging
 

@@ -35,21 +35,21 @@ namespace Hawkeye.UI.PropertyTabs
         /// <summary>
         /// Gets all the properties of the specified component that match the specified attributes and context.
         /// </summary>
-        /// An <see cref="T:System.ComponentModel.ITypeDescriptorContext" /> 
+        /// An <see cref="T:System.ComponentModel.ITypeDescriptorContext" />
         /// that indicates the context to retrieve properties from.</param>
         /// <param name="component">The component to retrieve properties from.</param>
         /// <param name="attributes">
-        /// An array of type <see cref="T:System.Attribute" /> that indicates the 
+        /// An array of type <see cref="T:System.Attribute" /> that indicates the
         /// attributes of the properties to retrieve.</param>
         /// <returns>
-        /// A <see cref="T:System.ComponentModel.PropertyDescriptorCollection" /> 
+        /// A <see cref="T:System.ComponentModel.PropertyDescriptorCollection" />
         /// that contains the properties matching the specified context and attributes.
         /// </returns>
         protected override PropertyDescriptorCollection GetAllProperties(
             ITypeDescriptorContext context, object component, Attribute[] attributes)
         {
             return context.GetAllEvents(
-                component, 
+                component,
                 inspectBaseClasses: true,
                 retrieveStaticMembers: true,
                 keepOriginalCategoryAttribute: false);

@@ -33,15 +33,6 @@ namespace Hawkeye.Configuration
             set => throw new NotSupportedException("This Settings Store is Read-Only.");
         }
 
-        /// <summary>
-        ///     Gets a value indicating whether this store is read only.
-        /// </summary>
-        /// <value>
-        ///     <para>
-        ///         <c>true</c> if this store is read only; otherwise, <c>false</c>
-        ///     </para>
-        ///     <para>.</para>
-        /// </value>
         /// <inheritdoc />
         public bool IsReadOnly => true;
 

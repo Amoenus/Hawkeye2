@@ -10,9 +10,9 @@ namespace Hawkeye.Configuration
         private const string DefaultSettingsFileName = "hawkeye.settings";
 
         private static readonly ILogService Log = LogManager.GetLogger(typeof(SettingsManager));
-        private static SettingsManagerImplementation _implementation;
+        private static ISettingsManagerImplementation _implementation;
 
-        private static SettingsManagerImplementation Implementation
+        private static ISettingsManagerImplementation Implementation
         {
             get
             {

@@ -8,7 +8,7 @@ using Hawkeye.Logging;
 
 namespace Hawkeye.Configuration
 {
-    internal class SettingsManagerImplementation
+    internal class SettingsManagerImplementation : ISettingsManagerImplementation
     {
         private const string ImplementationVersion = "1.0.0";
 
@@ -17,6 +17,11 @@ namespace Hawkeye.Configuration
         private readonly Dictionary<string, SettingsStore> _stores = new Dictionary<string, SettingsStore>();
         private XmlDocument _settingsDocument;
 
+        /// <summary>
+        /// Gets the store.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns><c>null</c></returns>
         public ISettingsStore GetStore(string key)
         {
             return null;

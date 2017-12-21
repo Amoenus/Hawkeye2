@@ -1,6 +1,9 @@
 ﻿namespace Hawkeye.Configuration
 {
-    class DefaultConfigurationProvider
+    /// <summary>
+    /// Default Configuration Provider
+    /// </summary>
+    internal static class DefaultConfigurationProvider
     {
         /// <summary>
         ///     The hawkeye store key

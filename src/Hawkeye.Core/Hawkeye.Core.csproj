@@ -67,6 +67,7 @@
     <Compile Include="ComponentModel\IProxy.cs" />
     <Compile Include="ComponentModel\ModuleInfoConverter.cs" />
     <Compile Include="Configuration\DefaultConfigurationProvider.cs" />
+    <Compile Include="Configuration\ISettingsManagerImplementation.cs" />
     <Compile Include="Configuration\layoutInterfaces.cs" />
     <Compile Include="Configuration\LayoutManager.cs" />
     <Compile Include="Configuration\ReadOnlyStoreWrapper.cs" />

@@ -6,8 +6,8 @@ namespace Hawkeye.Logging.log4net
 {
     internal class LogServiceAppender : AppenderSkeleton, ILogLevelThresholdSelector
     {
-        private bool _closed;
         private readonly ILogService _logService;
+        private bool _closed;
 
         public LogServiceAppender(ILogService logServiceToAppend)
         {

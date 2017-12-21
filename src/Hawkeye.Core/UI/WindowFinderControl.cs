@@ -1,89 +1,116 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using System.ComponentModel;
-
+using Hawkeye.Properties;
 using Hawkeye.WinApi;
 
 namespace Hawkeye.UI
 {
     /// <summary>
-    /// The "Window finder" user control.
+    ///     The "Window finder" user control.
     /// </summary>
     [DefaultEvent("ActiveWindowChanged")]
     internal partial class WindowFinderControl : UserControl
     {
-        private bool searching = false;
-        
-        private IntPtr windowHandle = IntPtr.Zero;
-        private Point lastLocationOnScreen = Point.Empty;
+        private Point _lastLocationOnScreen = Point.Empty;
+        private bool _searching;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WindowFinderControl"/> class.
+        ///     Initializes a new instance of the <see cref="WindowFinderControl" />
+        ///     class.
         /// </summary>
         public WindowFinderControl()
         {
             InitializeComponent();
         }
 
-        public event EventHandler ActiveWindowChanged;
-        public event EventHandler WindowSelected;
+        /// <summary>
+        /// Gets the active window handle.
+        /// </summary>
+        /// <value>
+        /// The active window handle.
+        /// </value>
+        public IntPtr ActiveWindowHandle { get; private set; } = IntPtr.Zero;
 
-        public IntPtr ActiveWindowHandle => windowHandle;
+        /// <summary>
+        /// Occurs when [active window changed].
+        /// </summary>
+        public event EventHandler ActiveWindowChanged;
+
+        /// <summary>
+        /// Occurs when [window selected].
+        /// </summary>
+        public event EventHandler WindowSelected;
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            if (DesignMode) return;
-            
-            base.MouseDown += (s, _) => { if (!searching) StartSearch(); };
-            base.MouseMove += (s, ev) =>
+            if (DesignMode)
             {
-                if (searching) Search(ev.Location);
-                //if (!searching) StopSearch();
-                //else Search(ev.Location);
+                return;
+            }
+
+            MouseDown += (s, _) =>
+            {
+                if (!_searching)
+                {
+                    StartSearch();
+                }
             };
-            base.MouseUp += (s, _) => StopSearch();
+            MouseMove += (s, ev) =>
+            {
+                if (_searching)
+                {
+                    Search(ev.Location);
+                }
+            };
+            MouseUp += (s, _) => StopSearch();
         }
 
         private void StartSearch()
         {
-            searching = true;
-            Cursor.Current = CursorHelper.LoadFrom(Properties.Resources.TargetIcon);
-            base.Capture = true;
+            _searching = true;
+            Cursor.Current = CursorHelper.LoadFrom(Resources.TargetIcon);
+            Capture = true;
         }
 
         private void Search(Point mouseLocation)
         {
             // Grab the window from the screen location of the mouse.
-            var locationOnScreen = PointToScreen(mouseLocation);
-            var foundWindowHandle = WindowHelper.FindWindow(locationOnScreen);
-            
+            Point locationOnScreen = PointToScreen(mouseLocation);
+            IntPtr foundWindowHandle = WindowHelper.FindWindow(locationOnScreen);
+
             // We found a handle.
             if (foundWindowHandle != IntPtr.Zero)
             {
                 // give it another try, it might be a child window (disabled, hidden .. something else)
                 // offset the point to be a client point of the active window
-                var locationInWindow = WindowHelper.ScreenToClient(foundWindowHandle, locationOnScreen);
+                Point locationInWindow = WindowHelper.ScreenToClient(foundWindowHandle, locationOnScreen);
                 if (locationInWindow != Point.Empty)
                 {
                     // check if there is some hidden/disabled child window at this point
                     IntPtr childWindowHandle = WindowHelper.FindChildWindow(foundWindowHandle, locationInWindow);
-                    if (childWindowHandle != IntPtr.Zero) foundWindowHandle = childWindowHandle;
+                    if (childWindowHandle != IntPtr.Zero)
+                    {
+                        foundWindowHandle = childWindowHandle;
+                    }
                 }
             }
 
             // Is this the same window as the last detected one?
-            if (lastLocationOnScreen != locationOnScreen)
+            if (_lastLocationOnScreen != locationOnScreen)
             {
-                lastLocationOnScreen = locationOnScreen;
-                if (windowHandle != foundWindowHandle)
+                _lastLocationOnScreen = locationOnScreen;
+                if (ActiveWindowHandle != foundWindowHandle)
                 {
-                    if (windowHandle != IntPtr.Zero)
-                        WindowHelper.RemoveAdorner(windowHandle); // Remove highlight
+                    if (ActiveWindowHandle != IntPtr.Zero)
+                    {
+                        WindowHelper.RemoveAdorner(ActiveWindowHandle); // Remove highlight
+                    }
 
-                    windowHandle = foundWindowHandle;
-                    WindowHelper.DrawAdorner(windowHandle); // highlight the window                    
+                    ActiveWindowHandle = foundWindowHandle;
+                    WindowHelper.DrawAdorner(ActiveWindowHandle); // highlight the window
                     OnActiveWindowChanged();
                 }
             }
@@ -91,23 +118,26 @@ namespace Hawkeye.UI
 
         private void StopSearch()
         {
-            searching = false;
-            base.Cursor = Cursors.Default;
-            base.Capture = false;
+            _searching = false;
+            Cursor = Cursors.Default;
+            Capture = false;
 
-            if (windowHandle != IntPtr.Zero)
-                WindowHelper.RemoveAdorner(windowHandle); // Remove highlight
+            if (ActiveWindowHandle != IntPtr.Zero)
+            {
+                WindowHelper.RemoveAdorner(ActiveWindowHandle); // Remove highlight
+            }
+
             OnWindowSelected();
         }
 
         private void OnWindowSelected()
         {
-            if (WindowSelected != null) WindowSelected(this, EventArgs.Empty);
+            WindowSelected?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnActiveWindowChanged()
         {
-            if (ActiveWindowChanged != null) ActiveWindowChanged(this, EventArgs.Empty);
-        }        
+            ActiveWindowChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

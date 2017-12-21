@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-
 using Hawkeye.Logging;
 
 namespace Hawkeye.Configuration
@@ -9,35 +8,38 @@ namespace Hawkeye.Configuration
     internal static partial class SettingsManager
     {
         private const string DefaultSettingsFileName = "hawkeye.settings";
-        private static readonly ILogService Log = LogManager.GetLogger(typeof(SettingsManager));
-        private static string _settingsFileName = string.Empty;
-        private static SettingsManagerImplementation _implementation;
 
         /// <summary>
-        /// The hawkeye store key
+        ///     The hawkeye store key
         /// </summary>
         public const string HawkeyeStoreKey = "hawkeye";
+
+        private static readonly ILogService Log = LogManager.GetLogger(typeof(SettingsManager));
+        private static SettingsManagerImplementation _implementation;
 
         private static SettingsManagerImplementation Implementation
         {
             get
             {
                 if (_implementation == null)
+                {
                     throw new ApplicationException("SettingsManager class was not initialized.");
+                }
+
                 return _implementation;
             }
         }
 
         /// <summary>
-        /// Gets the name of the settings file.
+        ///     Gets the name of the settings file.
         /// </summary>
         /// <value>
-        /// The name of the settings file.
+        ///     The name of the settings file.
         /// </value>
-        public static string SettingsFileName => _settingsFileName;
+        public static string SettingsFileName { get; private set; } = string.Empty;
 
         /// <summary>
-        /// Initializes the Settings manager with the specified filename.
+        ///     Initializes the Settings manager with the specified filename.
         /// </summary>
         /// <param name="filename">The Settings file name (optional).</param>
         public static void Initialize(string filename = "")
@@ -46,18 +48,25 @@ namespace Hawkeye.Configuration
             try
             {
                 if (string.IsNullOrEmpty(resolved))
+                {
                     resolved = DefaultSettingsFileName;
+                }
 
                 if (!Path.IsPathRooted(resolved)) // combine with default directory
+                {
                     resolved = Path.Combine(
                         HawkeyeApplication.Shell.ApplicationInfo.ApplicationDataDirectory, resolved);
+                }
 
-                _settingsFileName = resolved; // This is the settings file
+                SettingsFileName = resolved; // This is the settings file
 
                 _implementation = new SettingsManagerImplementation();
-                if (!File.Exists(_settingsFileName)) // Check file exists
-                    _implementation.CreateDefaultSettingsFile(_settingsFileName);
-                _implementation.Load(_settingsFileName);
+                if (!File.Exists(SettingsFileName)) // Check file exists
+                {
+                    _implementation.CreateDefaultSettingsFile(SettingsFileName);
+                }
+
+                _implementation.Load(SettingsFileName);
             }
             catch (Exception ex)
             {
@@ -74,7 +83,7 @@ namespace Hawkeye.Configuration
         }
 
         /// <summary>
-        /// Gets the store.
+        ///     Gets the store.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns></returns>
@@ -84,7 +93,7 @@ namespace Hawkeye.Configuration
         }
 
         /// <summary>
-        /// Gets the hawkeye store.
+        ///     Gets the hawkeye store.
         /// </summary>
         /// <returns></returns>
         public static ISettingsStore GetHawkeyeStore()
@@ -93,11 +102,11 @@ namespace Hawkeye.Configuration
         }
 
         /// <summary>
-        /// Saves this instance.
+        ///     Saves this instance.
         /// </summary>
         public static void Save()
         {
-            Implementation.Save(_settingsFileName);
+            Implementation.Save(SettingsFileName);
         }
     }
 }

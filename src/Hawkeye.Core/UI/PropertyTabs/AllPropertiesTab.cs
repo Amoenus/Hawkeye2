@@ -9,11 +9,6 @@ namespace Hawkeye.UI.PropertyTabs
     internal class AllPropertiesTab : BasePropertyTab
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AllPropertiesTab" /> class.
-        /// </summary>
-        public AllPropertiesTab() : base() { }
-        
-        /// <summary>
         /// Gets the bitmap that is displayed for the <see cref="T:System.Windows.Forms.Design.PropertyTab" />.
         /// </summary>
         /// <returns>
@@ -35,14 +30,14 @@ namespace Hawkeye.UI.PropertyTabs
         /// <summary>
         /// Gets all the properties of the specified component that match the specified attributes and context.
         /// </summary>
-        /// An <see cref="T:System.ComponentModel.ITypeDescriptorContext" /> 
+        /// An <see cref="T:System.ComponentModel.ITypeDescriptorContext" />
         /// that indicates the context to retrieve properties from.</param>
         /// <param name="component">The component to retrieve properties from.</param>
         /// <param name="attributes">
-        /// An array of type <see cref="T:System.Attribute" /> that indicates the 
+        /// An array of type <see cref="T:System.Attribute" /> that indicates the
         /// attributes of the properties to retrieve.</param>
         /// <returns>
-        /// A <see cref="T:System.ComponentModel.PropertyDescriptorCollection" /> 
+        /// A <see cref="T:System.ComponentModel.PropertyDescriptorCollection" />
         /// that contains the properties matching the specified context and attributes.
         /// </returns>
         protected override PropertyDescriptorCollection GetAllProperties(
@@ -69,11 +64,11 @@ namespace Hawkeye.UI.PropertyTabs
         /// that contains the properties matching the specified context and attributes.
         /// </returns>
         protected override PropertyDescriptorCollection AddPseudoProperties(
-            ITypeDescriptorContext context, object component, Attribute[] attributes, 
+            ITypeDescriptorContext context, object component, Attribute[] attributes,
             PropertyDescriptorCollection originalCollection)
         {
             originalCollection.Add(new TypePropertyDescriptor(component));
             return originalCollection;
         }
-    }   
+    }
 }

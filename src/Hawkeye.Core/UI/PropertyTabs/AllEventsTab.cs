@@ -9,11 +9,6 @@ namespace Hawkeye.UI.PropertyTabs
     internal class AllEventsTab : BasePropertyTab
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AllEventsTab" /> class.
-        /// </summary>
-        public AllEventsTab() : base() { }
-
-        /// <summary>
         /// Gets the bitmap that is displayed for the <see cref="T:System.Windows.Forms.Design.PropertyTab" />.
         /// </summary>
         /// <returns>

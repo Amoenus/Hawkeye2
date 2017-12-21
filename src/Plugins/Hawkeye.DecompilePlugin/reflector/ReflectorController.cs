@@ -4,30 +4,66 @@ namespace Hawkeye.DecompilePlugin.Reflector
 {
     internal class ReflectorController : BaseDecompilerController
     {
+        /// <summary>
+        ///     Determines whether the specified window <paramref name="title" />
+        ///     matches the actual decompiler.
+        /// </summary>
+        /// <param name="title">The window title.</param>
+        /// <returns>
+        ///     <c>true</c> if matches; otherwise, <c>false</c> .
+        /// </returns>
+        protected override bool DoesWindowTitleMatches(string title)
+        {
+            if (string.IsNullOrEmpty(title))
+            {
+                return false;
+            }
+
+            // FIX: issue http://hawkeye.codeplex.com/workitem/7784
+            // Reflector 6 and 7 (beta) titles start with ".NET Reflector"
+            if (title.StartsWith(".NET Reflector"))
+            {
+                return true;
+            }
+
+            if (title.StartsWith("Red Gate's .NET Reflector"))
+            {
+                return true;
+            }
+
+            if (title.StartsWith("Lutz Roeder's .NET Reflector"))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         #region API
 
         /// <summary>
-        /// Gets a value indicating whether a decompiler instance is running.
+        ///     Gets a value indicating whether a decompiler instance is running.
         /// </summary>
         /// <value>
-        /// <c>true</c> if a running decompiler instance could be found;
-        /// otherwise, <c>false</c> .
+        ///     <c>true</c> if a running decompiler instance could be found;
+        ///     otherwise, <c>false</c> .
         /// </value>
         /// <exception cref="NotImplementedException" />
         /// <inheritdoc />
         public override bool IsRunning => Send("Available\n4.0.0.0");
 
         /// <summary>
-        /// Loads the type's assembly then selects the specified type declaration in the decompiler;
+        ///     Loads the type's assembly then selects the specified
+        ///     <paramref name="type" /> declaration in the decompiler;
         /// </summary>
         /// <param name="type">The type to decompile.</param>
         /// <returns>
-        ///   <c>true</c> if the action succeeded; otherwise, <c>false</c>.
+        ///     <c>true</c> if the action succeeded; otherwise, <c>false</c> .
         /// </returns>
         public override bool GotoType(Type type)
         {
             // Loads the assembly
-            var assemblyFileName = type.Module.FullyQualifiedName;
+            string assemblyFileName = type.Module.FullyQualifiedName;
             Send("LoadAssembly\n" + assemblyFileName);
 
             // Select the type
@@ -79,28 +115,5 @@ namespace Hawkeye.DecompilePlugin.Reflector
         }
 
         #endregion
-
-        /// <summary>
-        /// Determines whether the specified window title matches the actual decompiler.
-        /// </summary>
-        /// <param name="title">The window title.</param>
-        /// <returns>
-        ///   <c>true</c> if matches; otherwise, <c>false</c>.
-        /// </returns>
-        protected override bool DoesWindowTitleMatches(string title)
-        {
-            if (string.IsNullOrEmpty(title)) return false;
-
-            // FIX: issue http://hawkeye.codeplex.com/workitem/7784
-            // Reflector 6 and 7 (beta) titles start with ".NET Reflector"
-            if (title.StartsWith(".NET Reflector"))
-                return true;
-            if (title.StartsWith("Red Gate's .NET Reflector"))
-                return true;
-            if (title.StartsWith("Lutz Roeder's .NET Reflector"))
-                return true;
-
-            return false;
-        }
     }
 }

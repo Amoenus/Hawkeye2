@@ -5,14 +5,9 @@ using Hawkeye.Logging;
 
 namespace Hawkeye.Configuration
 {
-    internal static partial class SettingsManager
+    internal static class SettingsManager
     {
         private const string DefaultSettingsFileName = "hawkeye.settings";
-
-        /// <summary>
-        ///     The hawkeye store key
-        /// </summary>
-        public const string HawkeyeStoreKey = "hawkeye";
 
         private static readonly ILogService Log = LogManager.GetLogger(typeof(SettingsManager));
         private static SettingsManagerImplementation _implementation;
@@ -98,7 +93,7 @@ namespace Hawkeye.Configuration
         /// <returns></returns>
         public static ISettingsStore GetHawkeyeStore()
         {
-            return GetStore(HawkeyeStoreKey);
+            return GetStore(DefaultConfigurationProvider.HawkeyeStoreKey);
         }
 
         /// <summary>

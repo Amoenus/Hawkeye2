@@ -33,8 +33,7 @@ namespace Hawkeye.ComponentModel
 
         private class ModuleInfoPropertyDescriptor : SimplePropertyDescriptor
         {
-            private readonly string _propname = string.Empty;
-            private Type _proptype;
+            private readonly string _propName;
 
             /// <summary>
             ///     <para>
@@ -46,13 +45,14 @@ namespace Hawkeye.ComponentModel
             /// <param name="name">The name.</param>
             /// <param name="attributes">The attributes.</param>
             /// <param name="type">The type.</param>
+            /// <inheritdoc />
             public ModuleInfoPropertyDescriptor(string name, Attribute[] attributes, Type type)
                 : base(typeof(IModuleInfo), name, type, attributes)
             {
-                _propname = name;
-                _proptype = type;
+                _propName = name;
             }
 
+            /// <inheritdoc />
             /// <summary>
             ///     Always read-only!
             /// </summary>
@@ -72,7 +72,7 @@ namespace Hawkeye.ComponentModel
             {
                 Type type = component?.GetType();
 
-                PropertyInfo propertyInfo = type?.GetProperty(_propname, bindingFlags);
+                PropertyInfo propertyInfo = type?.GetProperty(_propName, bindingFlags);
 
                 MethodInfo methodInfo = propertyInfo?.GetGetMethod();
 

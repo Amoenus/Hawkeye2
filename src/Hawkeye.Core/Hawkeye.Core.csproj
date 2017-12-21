@@ -66,12 +66,14 @@
     <Compile Include="ComponentModel\History.cs" />
     <Compile Include="ComponentModel\IProxy.cs" />
     <Compile Include="ComponentModel\ModuleInfoConverter.cs" />
+    <Compile Include="Configuration\DefaultConfigurationProvider.cs" />
     <Compile Include="Configuration\layoutInterfaces.cs" />
     <Compile Include="Configuration\LayoutManager.cs" />
-    <Compile Include="Configuration\SettingsManager.impl.cs" />
+    <Compile Include="Configuration\ReadOnlyStoreWrapper.cs" />
     <Compile Include="Configuration\SettingsManager.cs" />
-    <Compile Include="Configuration\SettingsManager.store.cs" />
     <Compile Include="ComponentModel\ComponentModelExtensions.cs" />
+    <Compile Include="Configuration\SettingsManagerImplementation.cs" />
+    <Compile Include="Configuration\SettingsStore.cs" />
     <Compile Include="Extensibility\PluginManager.cs" />
     <Compile Include="extensions\ObjectExtensions.cs" />
     <Compile Include="extensions\StringExtensions.cs" />

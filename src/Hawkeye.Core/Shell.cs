@@ -15,7 +15,7 @@ namespace Hawkeye
 {
     internal class Shell : IHawkeyeHost
     {
-        private readonly Guid hawkeyeId;
+        private readonly Guid _hawkeyeId;
         private ILogServiceFactory _logFactory;
         private MainControl _mainControl;
 
@@ -26,7 +26,7 @@ namespace Hawkeye
         /// </summary>
         public Shell()
         {
-            hawkeyeId = Guid.NewGuid();
+            _hawkeyeId = Guid.NewGuid();
             ApplicationInfo = new HawkeyeApplicationInfo();
 
             // Do nothing else here, otherwise, HawkeyeApplication static constructor may fail.
@@ -71,7 +71,7 @@ namespace Hawkeye
                     windowToKill, WindowMessages.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
             }
 
-            int appId = hawkeyeId.GetHashCode();
+            int appId = _hawkeyeId.GetHashCode();
             LogInfo("Running Hawkeye in its own process.", appId);
             LogDebug($"Parameters: {windowToSpy}, {windowToKill}.", appId);
             Initialize();
@@ -192,7 +192,7 @@ namespace Hawkeye
             // Let's get the target window associated processId.
             NativeMethods.GetWindowThreadProcessId(windowToSpy, out int processId);
 
-            int appId = hawkeyeId.GetHashCode();
+            int appId = _hawkeyeId.GetHashCode();
             LogInfo($"Running Hawkeye attached to application {Application.ProductName} (processId={processId})",
                 appId);
             Initialize();
@@ -324,11 +324,11 @@ namespace Hawkeye
         /// <inheritdoc />
         public ISettingsStore GetSettings(string key)
         {
-            if (string.IsNullOrEmpty(key) || key == SettingsManager.HawkeyeStoreKey)
+            if (string.IsNullOrEmpty(key) || key == DefaultConfigurationProvider.HawkeyeStoreKey)
             {
                 // Let's get a read-only version of Hawkeye settings
                 ISettingsStore hawkeyeSettings = SettingsManager.GetHawkeyeStore();
-                return new SettingsManager.ReadOnlyStoreWrapper(hawkeyeSettings);
+                return new ReadOnlyStoreWrapper(hawkeyeSettings);
             }
 
             return SettingsManager.GetStore(key);

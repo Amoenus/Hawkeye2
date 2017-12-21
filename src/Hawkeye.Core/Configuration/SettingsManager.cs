@@ -8,12 +8,15 @@ namespace Hawkeye.Configuration
 {
     internal static partial class SettingsManager
     {
-        private static readonly string DefaultSettingsFileName = "hawkeye.settings";
+        private const string DefaultSettingsFileName = "hawkeye.settings";
         private static readonly ILogService Log = LogManager.GetLogger(typeof(SettingsManager));
         private static string _settingsFileName = string.Empty;
-        private static SettingsManagerImplementation _implementation = null;
+        private static SettingsManagerImplementation _implementation;
 
-        public static readonly string HawkeyeStoreKey = "hawkeye";
+        /// <summary>
+        /// The hawkeye store key
+        /// </summary>
+        public const string HawkeyeStoreKey = "hawkeye";
 
         private static SettingsManagerImplementation Implementation
         {
@@ -25,6 +28,12 @@ namespace Hawkeye.Configuration
             }
         }
 
+        /// <summary>
+        /// Gets the name of the settings file.
+        /// </summary>
+        /// <value>
+        /// The name of the settings file.
+        /// </value>
         public static string SettingsFileName => _settingsFileName;
 
         /// <summary>
@@ -64,16 +73,28 @@ namespace Hawkeye.Configuration
             }
         }
 
+        /// <summary>
+        /// Gets the store.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
         public static ISettingsStore GetStore(string key)
         {
             return Implementation.GetStore(key);
         }
 
+        /// <summary>
+        /// Gets the hawkeye store.
+        /// </summary>
+        /// <returns></returns>
         public static ISettingsStore GetHawkeyeStore()
         {
             return GetStore(HawkeyeStoreKey);
         }
 
+        /// <summary>
+        /// Saves this instance.
+        /// </summary>
         public static void Save()
         {
             Implementation.Save(_settingsFileName);

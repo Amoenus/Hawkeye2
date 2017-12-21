@@ -61,7 +61,6 @@ namespace Hawkeye.Scripting
             }
 
             return list.ToArray();
-
         }
 
         private static void AddMember(ref List<string> list, int longestMemberCategory, MemberInfo member,

@@ -7,8 +7,8 @@ namespace Hawkeye.ComponentModel
 {
     internal class InstanceEventPropertyDescriptor : BaseEventPropertyDescriptor
     {
-        private readonly object component;
-        private bool keepOriginalCategory = true;
+        private readonly object _component;
+        private readonly bool _keepOriginalCategory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InstanceEventPropertyDescriptor" /> class.
@@ -20,20 +20,20 @@ namespace Hawkeye.ComponentModel
         public InstanceEventPropertyDescriptor(object instance, Type ownerType, EventInfo eventInfo, bool keepOriginalCategoryAttribute = true)
             : base(ownerType, eventInfo)
         {
-            component = instance;
-            keepOriginalCategory = keepOriginalCategoryAttribute;
+            _component = instance;
+            _keepOriginalCategory = keepOriginalCategoryAttribute;
         }
 
         protected override void FillAttributes(IList attributeList)
         {
             base.FillAttributes(attributeList);
-            if (!keepOriginalCategory)
-                attributeList.Add(new CategoryAttribute("(instance: " + base.ComponentType.Name + ")"));
+            if (!_keepOriginalCategory)
+                attributeList.Add(new CategoryAttribute("(instance: " + ComponentType.Name + ")"));
         }
 
         protected override bool IsFiltered(Attribute attribute)
         {
-            return !keepOriginalCategory && attribute is CategoryAttribute;
+            return !_keepOriginalCategory && attribute is CategoryAttribute;
         }
     }
 }

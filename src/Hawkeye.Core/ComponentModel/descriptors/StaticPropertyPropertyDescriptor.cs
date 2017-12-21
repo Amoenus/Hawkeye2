@@ -1,50 +1,58 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace Hawkeye.ComponentModel
 {
     internal class StaticPropertyPropertyDescriptor : BasePropertyPropertyDescriptor
     {
-        private readonly Type type;
-        private string criticalGetError = null;
-        private string criticalSetError = null;
-        private bool keepOriginalCategory = true;
+        private readonly bool _keepOriginalCategory;
+        private readonly Type _type;
+        private string _criticalGetError;
+        private string _criticalSetError;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StaticPropertyPropertyDescriptor" /> class.
+        ///     Initializes a new instance of the
+        ///     <see cref="StaticPropertyPropertyDescriptor" /> class.
         /// </summary>
         /// <param name="objectType">Type of the object.</param>
         /// <param name="propertyInfo">The property info.</param>
-        /// <param name="keepOriginalCategoryAttribute">if set to <c>true</c> [keep original category attribute].</param>
-        public StaticPropertyPropertyDescriptor(Type objectType, PropertyInfo propertyInfo, bool keepOriginalCategoryAttribute = true)
+        /// <param name="keepOriginalCategoryAttribute">
+        ///     if set to <c>true</c> [keep original category attribute].
+        /// </param>
+        public StaticPropertyPropertyDescriptor(Type objectType, PropertyInfo propertyInfo,
+            bool keepOriginalCategoryAttribute = true)
             : base(propertyInfo)
         {
-            type = objectType;
-            keepOriginalCategory = keepOriginalCategoryAttribute;
+            _type = objectType;
+            _keepOriginalCategory = keepOriginalCategoryAttribute;
         }
 
-        public override bool CanResetValue(object component) { return false; } //TODO: why should this be false?
+        public override Type ComponentType => _type;
 
-        public override Type ComponentType => type;
+        public override bool IsReadOnly => !PropertyInfo.CanWrite;
+
+        public override Type PropertyType => PropertyInfo.PropertyType;
+
+        public override bool CanResetValue(object component)
+        {
+            return false;
+        } //TODO: why should this be false?
 
         public override object GetValue(object component)
         {
-            if (!base.PropertyInfo.CanRead) return null;
-            return base.PropertyInfo.Get(null, ref criticalGetError);
+            return !PropertyInfo.CanRead ? null : PropertyInfo.Get(null, ref _criticalGetError);
         }
 
-        public override bool IsReadOnly => !base.PropertyInfo.CanWrite;
-
-        public override Type PropertyType => base.PropertyInfo.PropertyType;
-
-        public override void ResetValue(object component) { }
+        public override void ResetValue(object component)
+        {
+        }
 
         public override void SetValue(object component, object value)
         {
             value = value.GetInnerObject(); // Make sure we are affecting a real object.
-            var result = base.PropertyInfo.Set(component, value, ref criticalSetError);
+            object result = PropertyInfo.Set(component, value, ref _criticalSetError);
 
             //if ( WarningsHelper.Instance.SetPropertyWarning(propInfo.DeclaringType.Name, value) )
             //{
@@ -61,13 +69,15 @@ namespace Hawkeye.ComponentModel
         protected override void FillAttributes(IList attributeList)
         {
             base.FillAttributes(attributeList);
-            if (!keepOriginalCategory)
-                attributeList.Add(new CategoryAttribute("(static: " + type.Name + ")"));
+            if (!_keepOriginalCategory)
+            {
+                attributeList.Add(new CategoryAttribute("(static: " + _type.Name + ")"));
+            }
         }
 
         protected override bool IsFiltered(Attribute attribute)
         {
-            return !keepOriginalCategory && attribute is CategoryAttribute;
+            return !_keepOriginalCategory && attribute is CategoryAttribute;
         }
     }
 }

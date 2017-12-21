@@ -1,15 +1,14 @@
-﻿using System.IO;
-using System.Xml;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Collections.Generic;
-
+using System.Xml;
 using Hawkeye.Logging;
-using System;
 
 namespace Hawkeye.Configuration
 {
-    partial class SettingsManager
+    internal partial class SettingsManager
     {
         private class SettingsManagerImplementation
         {
@@ -17,8 +16,8 @@ namespace Hawkeye.Configuration
 
             private static readonly ILogService Log = LogManager.GetLogger<SettingsManagerImplementation>();
 
-            private Dictionary<string, SettingsStore> _stores = new Dictionary<string, SettingsStore>();
-            private XmlDocument _settingsDocument = null;
+            private readonly Dictionary<string, SettingsStore> _stores = new Dictionary<string, SettingsStore>();
+            private XmlDocument _settingsDocument;
 
             public ISettingsStore GetStore(string key)
             {
@@ -51,17 +50,18 @@ namespace Hawkeye.Configuration
                     _settingsDocument.Load(filename);
                 }
 
-                var rootNode = _settingsDocument.ChildNodes.Cast<XmlNode>().SingleOrDefault(xn => xn.Name == "settings");
+                XmlNode rootNode = _settingsDocument.ChildNodes.Cast<XmlNode>()
+                    .SingleOrDefault(xn => xn.Name == "settings");
                 if (rootNode == null)
                 {
                     rootNode = _settingsDocument.CreateElement("settings");
-                    var versionNode = _settingsDocument.CreateAttribute("version");
+                    XmlAttribute versionNode = _settingsDocument.CreateAttribute("version");
                     versionNode.Value = ImplementationVersion;
                     rootNode.Attributes.Append(versionNode);
                     return;
                 }
 
-                var children = rootNode.ChildNodes.Cast<XmlNode>();
+                IEnumerable<XmlNode> children = rootNode.ChildNodes.Cast<XmlNode>();
                 if (!children.Any())
                 {
                     // Add Hawkeye node
@@ -69,29 +69,42 @@ namespace Hawkeye.Configuration
                     return;
                 }
 
-                foreach (var node in children)
+                foreach (XmlNode node in children)
                 {
                     if (node.Name == HawkeyeStoreKey)
+                    {
                         LoadHawkeyeSettings(node);
+                    }
                     else
                     {
-                        var prefix = node.Name;
-                        foreach (var subnode in node.ChildNodes.Cast<XmlNode>())
+                        string prefix = node.Name;
+                        foreach (XmlNode subnode in node.ChildNodes.Cast<XmlNode>())
+                        {
                             LoadSettings(subnode, $"{prefix}/{subnode.Name}");
+                        }
                     }
                 }
             }
 
             private void LoadHawkeyeSettings(XmlNode node)
             {
-                var children = node.ChildNodes.Cast<XmlNode>();
-                if (!children.Any()) return;
+                IEnumerable<XmlNode> children = node.ChildNodes.Cast<XmlNode>();
+                if (!children.Any())
+                {
+                    return;
+                }
 
-                var configurationNode = children.SingleOrDefault(n => n.Name == "configuration");
-                if (configurationNode != null) LoadSettings(configurationNode, HawkeyeStoreKey);
+                XmlNode configurationNode = children.SingleOrDefault(n => n.Name == "configuration");
+                if (configurationNode != null)
+                {
+                    LoadSettings(configurationNode, HawkeyeStoreKey);
+                }
 
-                var layoutNode = children.SingleOrDefault(n => n.Name == "layouts");
-                if (layoutNode != null) LayoutManager.Load(layoutNode);
+                XmlNode layoutNode = children.SingleOrDefault(n => n.Name == "layouts");
+                if (layoutNode != null)
+                {
+                    LayoutManager.Load(layoutNode);
+                }
             }
 
             private void LoadSettings(XmlNode node, string storeKey)
@@ -113,7 +126,7 @@ namespace Hawkeye.Configuration
                 if (File.Exists(filename))
                 {
                     // Create a backup copy
-                    var backup = filename + ".bak";
+                    string backup = filename + ".bak";
                     try
                     {
                         File.Copy(filename, backup, true);

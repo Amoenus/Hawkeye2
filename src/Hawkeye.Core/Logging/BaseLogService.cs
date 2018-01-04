@@ -23,6 +23,7 @@ namespace Hawkeye.Logging
         ///     Logs the specified log entry.
         /// </summary>
         /// <param name="entry">The entry to log.</param>
+        /// <inheritdoc />
         public abstract void LogEntry(ILogEntry entry);
 
         /// <summary>
@@ -35,6 +36,7 @@ namespace Hawkeye.Logging
         /// <returns>
         ///     A <see cref="ILogEntry" /> object ready to be logged.
         /// </returns>
+        /// <inheritdoc />
         public virtual ILogEntry MakeLogEntry(LogLevel level, string message, Exception exception)
         {
             return new LogEntry {Level = level, Message = message, Exception = exception};

@@ -81,6 +81,9 @@
     <Compile Include="extensions\TypeExtensions.cs" />
     <Compile Include="HawkeyeApplication.cs" />
     <Compile Include="HawkeyeApplicationInfo.cs" />
+    <Compile Include="Logging\ILogEntryFormatter.cs" />
+    <Compile Include="Logging\ILogLevelThresholdSelector.cs" />
+    <Compile Include="Logging\ILogServiceAppendable.cs" />
     <Compile Include="Scripting\Interfaces\IScriptLogger.cs" />
     <Compile Include="Scripting\Interfaces\IScriptLoggerHost.cs" />
     <Compile Include="Scripting\Loggers\RichTextBoxLogger.cs" />
@@ -94,7 +97,7 @@
     <Compile Include="Shell.cs" />
     <Compile Include="HawkeyeAttacher.cs" />
     <Compile Include="Logging\BaseLogService.cs" />
-    <Compile Include="Logging\Interfaces.cs" />
+    <Compile Include="Logging\ILogServiceFactory.cs" />
     <Compile Include="Logging\LogEntry.cs" />
     <Compile Include="Logging\LogManager.cs" />
     <Compile Include="Logging\LogManager.Debug.cs" />

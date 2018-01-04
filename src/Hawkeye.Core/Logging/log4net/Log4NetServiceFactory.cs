@@ -15,15 +15,19 @@ namespace Hawkeye.Logging.log4net
     /// </summary>
     internal class Log4NetServiceFactory : ILogServiceFactory, ILogServiceAppendable
     {
+        /// <summary>
+        ///     The configuration file key
+        /// </summary>
         public const string ConfigurationFileKey = "configurationFile";
 
-        private static bool log4netConfiguredYet;
+        private static bool _log4NetConfiguredYet;
 
-        private static Log4NetService rootLog4NetService;
+        private static Log4NetService _rootLog4NetService;
 
+        /// <inheritdoc />
         /// <summary>
         ///     Initializes a new instance of the
-        ///     <see cref="Log4NetServiceFactory" /> class.
+        ///     <see cref="T:Hawkeye.Logging.log4net.Log4NetServiceFactory" /> class.
         /// </summary>
         public Log4NetServiceFactory() :
             this(string.Empty)
@@ -47,18 +51,20 @@ namespace Hawkeye.Logging.log4net
         {
             get
             {
-                if (rootLog4NetService == null)
+                if (_rootLog4NetService != null)
                 {
-                    ILogger rootLogger = GetRootLogger();
-                    if (rootLogger == null)
-                    {
-                        return null;
-                    }
-
-                    rootLog4NetService = new Log4NetService(rootLogger);
+                    return _rootLog4NetService;
                 }
 
-                return rootLog4NetService;
+                ILogger rootLogger = GetRootLogger();
+                if (rootLogger == null)
+                {
+                    return null;
+                }
+
+                _rootLog4NetService = new Log4NetService(rootLogger);
+
+                return _rootLog4NetService;
             }
         }
 
@@ -73,7 +79,7 @@ namespace Hawkeye.Logging.log4net
 
         private static void ConfigureLog4Net(string filename)
         {
-            if (log4netConfiguredYet)
+            if (_log4NetConfiguredYet)
             {
                 return;
             }
@@ -85,15 +91,15 @@ namespace Hawkeye.Logging.log4net
                 if (file != null)
                 {
                     XmlConfigurator.Configure(file);
-                    log4netConfiguredYet = true;
+                    _log4NetConfiguredYet = true;
                 }
             }
 
             // maybe we have config in the app.config file?
-            if (!log4netConfiguredYet)
+            if (!_log4NetConfiguredYet)
             {
                 XmlConfigurator.Configure();
-                log4netConfiguredYet = true;
+                _log4NetConfiguredYet = true;
             }
 
             // Forces initialization
@@ -139,16 +145,14 @@ namespace Hawkeye.Logging.log4net
         private static Assembly GetEntryAssembly()
         {
             Assembly entryAssembly = Assembly.GetEntryAssembly();
-            if (entryAssembly != null)
-            {
-                return entryAssembly;
-            }
 
-            return typeof(Log4NetServiceFactory).Assembly; // fallback: should never happen.
+            return entryAssembly
+                   ?? typeof(Log4NetServiceFactory).Assembly; // fall back: should never happen.
         }
 
         #region ILogServiceFactory Members
 
+        /// <inheritdoc />
         /// <summary>
         ///     Obtains an instance of the logger service for the specified
         ///     <paramref name="type" /> and optional additional data.
@@ -156,7 +160,7 @@ namespace Hawkeye.Logging.log4net
         /// <param name="type">The type.</param>
         /// <param name="additionalData">The additional data.</param>
         /// <returns>
-        ///     An implementation of <see cref="ILogService" /> .
+        ///     An implementation of <see cref="T:Hawkeye.Logging.ILogService" /> .
         /// </returns>
         public ILogService GetLogger(Type type, IDictionary<string, object> additionalData = null)
         {
@@ -164,6 +168,7 @@ namespace Hawkeye.Logging.log4net
             return CreateService(type);
         }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Appends the specified log service to a root log service (the current
         ///     instance).
@@ -171,7 +176,7 @@ namespace Hawkeye.Logging.log4net
         /// <param name="logService">The log service.</param>
         /// <param name="additionalData">The optional additional data.</param>
         /// <returns>
-        ///     An implementation of <see cref="ILogLevelThresholdSelector" />
+        ///     An implementation of <see cref="T:Hawkeye.Logging.ILogLevelThresholdSelector" />
         ///     allowing to set a maximum log level to trace.
         /// </returns>
         public ILogLevelThresholdSelector AppendLogService(ILogService logService,
@@ -185,6 +190,7 @@ namespace Hawkeye.Logging.log4net
             return RootLog4NetService?.AppendLogService(logService, additionalData);
         }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Closes all the resources held by the various loggers.
         /// </summary>

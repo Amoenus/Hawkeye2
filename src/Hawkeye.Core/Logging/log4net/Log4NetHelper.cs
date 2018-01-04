@@ -119,9 +119,9 @@ namespace Hawkeye.Logging.log4net
                 return null;
             }
 
-            if (entry.Tag is LoggingEvent)
+            if (entry.Tag is LoggingEvent loggingEvent)
             {
-                return (LoggingEvent) entry.Tag;
+                return loggingEvent;
             }
 
             return new LoggingEvent(

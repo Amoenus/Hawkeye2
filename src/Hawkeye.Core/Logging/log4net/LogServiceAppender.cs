@@ -9,6 +9,12 @@ namespace Hawkeye.Logging.log4net
         private readonly ILogService _logService;
         private bool _closed;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="LogServiceAppender" /> class.
+        /// </summary>
+        /// <param name="logServiceToAppend">The log service to append.</param>
+        /// <exception cref="ArgumentNullException">logServiceToAppend</exception>
+        /// <inheritdoc />
         public LogServiceAppender(ILogService logServiceToAppend)
         {
             _logService = logServiceToAppend ?? throw new ArgumentNullException(nameof(logServiceToAppend));
@@ -31,6 +37,7 @@ namespace Hawkeye.Logging.log4net
 
         #region IDisposable Members
 
+        /// <inheritdoc />
         /// <summary>
         ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
